@@ -24,7 +24,7 @@ CONFIG_TIPS_MD = """
 - **spark.serializer** — Kryo for faster/smaller serialization.
 - **spark.rdd.compress / spark.shuffle.*.compress** — Keep true; saves IO.
 - **spark.sql.files.maxPartitionBytes** — Input split size (bytes). 256 MiB typical for Parquet/Delta.
-- **spark.sql.adaptive.advisoryPartitionSizeInBytes** — AQE target partition size.
+- **spark.sql.adaptive.advisoryPartitionSizeInBytes** — AQE target partition size (post-shuffle; usually 2–4× file split).
 - **spark.sql.autoBroadcastJoinThreshold** — Broadcast truly small dimension tables to avoid shuffles.
 """
 
@@ -158,26 +158,31 @@ def spark_conf_from_layout(
     exec_mem_gb: float,
     part_count: int,
     part_mb: int,
+    advisory_mb: int,
     enable_dynamic_allocation: bool = True,
 ) -> Dict[str, str]:
     total_cores = max(1, total_execs * max(1, exec_cores))
-    default_parallelism = max(2 * total_cores, part_count)  # RDD world
-    shuffle_partitions = min(max(2 * total_cores, part_count), 4 * total_cores)  # cap at 4× cores
+    default_parallelism = min(20000, max(2 * total_cores, part_count))  # cap to avoid pathological values
+    shuffle_partitions = min(20000, max(2 * total_cores, part_count), 4 * total_cores)
     bytes_per_part = part_mb * 1024 * 1024
+    advisory_bytes = advisory_mb * 1024 * 1024
+    exec_heap_gb_int = max(1, int(math.floor(exec_mem_gb)))  # don't exceed container
 
     conf = {
         "spark.sql.adaptive.enabled": "true",
+        "spark.sql.adaptive.skewJoin.enabled": "true",
         "spark.serializer": "org.apache.spark.serializer.KryoSerializer",
         "spark.rdd.compress": "true",
         "spark.shuffle.compress": "true",
         "spark.shuffle.spill.compress": "true",
         "spark.executor.cores": str(exec_cores),
-        "spark.executor.memory": f"{int(exec_mem_gb)}g",
+        "spark.executor.memory": f"{exec_heap_gb_int}g",
         "spark.default.parallelism": str(default_parallelism),
         "spark.sql.shuffle.partitions": str(shuffle_partitions),
         "spark.sql.files.maxPartitionBytes": str(bytes_per_part),
-        "spark.sql.adaptive.advisoryPartitionSizeInBytes": str(bytes_per_part),
+        "spark.sql.adaptive.advisoryPartitionSizeInBytes": str(advisory_bytes),
         "spark.driver.cores": str(min(8, max(2, exec_cores))),
+        "spark.driver.memory": f"{max(4, min(32, exec_heap_gb_int))}g",
         "spark.driver.maxResultSize": "2g",
     }
 
@@ -193,6 +198,18 @@ def filter_catalog(catalog: List[Dict], families: List[str]) -> List[Dict]:
     if families:
         return [c for c in catalog if any(c["name"].lower().startswith(fam.lower()) for fam in families)]
     return catalog
+
+# Cloud-aware helpers for family identification
+def _azure_family(name: str) -> str:
+    # "Standard_E4s_v3" -> "Standard_E"
+    parts = name.split("_")
+    if len(parts) >= 2 and parts[0] == "Standard":
+        return f"{parts[0]}_{parts[1][0]}"
+    return parts[0]
+
+def _aws_family(name: str) -> str:
+    # "m5d.2xlarge" -> "m5d"
+    return name.split(".")[0]
 
 # -----------------------
 # 🖼️ UI
@@ -215,11 +232,15 @@ if catalog_source == "Databricks API (placeholder)":
 # Sidebar: filters
 st.sidebar.markdown("---")
 working_catalog = BUILTIN_CATALOG[cloud_choice]
-family_options = sorted(list({x["name"].split("_")[0] for x in working_catalog}))
+if cloud_choice == "Azure":
+    family_options = sorted({_azure_family(x["name"]) for x in working_catalog})
+else:
+    family_options = sorted({_aws_family(x["name"]) for x in working_catalog})
+
 family_filter = st.sidebar.multiselect(
     "Filter by family/prefix",
     options=family_options,
-    help="Example: Standard_D, Standard_E, m5d, r5d, etc."
+    help="Examples: Standard_E, Standard_D (Azure) · m5d, r5d (AWS)"
 )
 
 INSTANCE_CATALOG: List[Dict] = filter_catalog(working_catalog, family_filter)
@@ -269,7 +290,8 @@ with right:
     st.header("ℹ️ How these are used")
     st.markdown(
         """
-- **Partitions:** ~128–256 MB per split; format matters.
+- **File splits:** ~128–256 MB per split; format matters.
+- **AQE advisory target:** ~2× file split (min 512 MB); AQE coalesces shuffles to this size.
 - **Waves:** cores ≈ partitions / waves (2–3 typical).
 - **Memory target:** workload × input (+ cache) × skew; also check GB/core.
 - **Layout:** ~4–6 cores/executor; add 10–30% overhead; reserve OS CPU/RAM.
@@ -283,6 +305,7 @@ preset = WORKLOAD_PRESETS[workload]
 fmt = FILE_FORMATS[file_fmt]
 part_mb = target_part_mb_override if target_part_mb_override > 0 else fmt["partition_mb"]
 num_partitions = partitions_for_data(data_size_gb, part_mb)
+advisory_mb = max(part_mb * 2, 512)  # AQE target partition size (post-shuffle)
 
 # CPU sizing via waves
 total_cores_target = max(4, ceil_div(num_partitions, max(1, waves)))
@@ -300,7 +323,7 @@ c1, c2, c3 = st.columns(3)
 c1.metric("Minimum total memory (GB)", f"{int(math.ceil(min_total_memory_gb))}",
           help=f"Working set ≈ {mem_mult:.2f}× input + cache; also ≥ {gb_per_core} GB/core")
 c2.metric("Target total cores", f"{total_cores_target}", help=f"Cores ≈ partitions / waves (waves={waves})")
-c3.metric("Target input partitions", f"{num_partitions}", help=f"~{part_mb} MB per partition for {file_fmt}")
+c3.metric("Target input partitions", f"{num_partitions}", help=f"~{part_mb} MB file split; AQE advisory ~{advisory_mb} MB")
 
 # -----------------------
 # 🔎 Candidate Search
@@ -357,6 +380,7 @@ for inst in INSTANCE_CATALOG:
         exec_mem_gb=exec_heap_gb,
         part_count=num_partitions,
         part_mb=part_mb,
+        advisory_mb=advisory_mb,
         enable_dynamic_allocation=dyn_alloc,
     ) if total_execs > 0 else {}
 
@@ -430,9 +454,10 @@ else:
     st.subheader("📝 Spark config output")
     _conf = dict(best["_conf"])
 
-    # executor memoryOverhead from overhead fraction
+    # executor memoryOverhead from overhead fraction (use the int heap set in conf to avoid overcommit)
     try:
-        mem_overhead_mb = int(round((best["Exec memory (GB)"] * (overhead_frac / (1 - overhead_frac))) * 1024))
+        exec_heap_gb_int = max(1, int(math.floor(best["Exec memory (GB)"])))
+        mem_overhead_mb = int(round(exec_heap_gb_int * (overhead_frac / (1 - overhead_frac)) * 1024))
         _conf["spark.executor.memoryOverhead"] = str(max(384, mem_overhead_mb))
     except Exception:
         pass
@@ -460,6 +485,7 @@ else:
         "spark.default.parallelism",
         "spark.sql.shuffle.partitions",
         "spark.sql.adaptive.enabled",
+        "spark.sql.adaptive.skewJoin.enabled",
         "spark.sql.files.maxPartitionBytes",
         "spark.sql.adaptive.advisoryPartitionSizeInBytes",
         "spark.serializer",
@@ -497,7 +523,7 @@ else:
         st.markdown(f"""
 - **Cloud**: **{cloud_choice}**
 - **Input**: **{data_size_gb} GB** {file_fmt} · Workload: **{workload}**
-- **Partitions**: **{num_partitions}** (~{part_mb} MB each) · **Waves**: {waves}
+- **Partitions**: **{num_partitions}** (~{part_mb} MB file split; AQE advisory ~{advisory_mb} MB) · **Waves**: {waves}
 - **Targets**: **{total_cores_target} cores**, **≥ {int(math.ceil(min_total_memory_gb))} GB** executor heap
 - **Cluster**: **{best['Instance']} × {int(best['Workers'])}** workers (limiting: **{best['Limiting']}**)
 - **Executors**: **{int(best['Total executors'])}** total — {int(best['Execs / node'])}/node · {int(best['Exec cores'])} cores/executor · {best['Exec memory (GB)']} GB heap/executor
@@ -525,6 +551,5 @@ st.markdown(
 - **Cloud selector** chooses Azure vs AWS; using the **built-in offline catalog** for now.
 - **Filters** let you narrow by instance family (e.g., Standard_E, Standard_D, r5d, m5d).
 - **Recommendation** packs executors into instances and proposes the smallest cluster that meets CPU & memory goals.
-
     """
 )
