@@ -32,10 +32,26 @@ CONFIG_TIPS_MD = """
 # 🎛️ Inputs & Heuristics
 # -----------------------
 WORKLOAD_PRESETS = {
-    "Simple ETL / Reads": {"memory_multiplier": 1.5, "gb_per_core": 2.0, "target_partition_mb": 256},
-    "Joins / Aggregations": {"memory_multiplier": 2.5, "gb_per_core": 3.5, "target_partition_mb": 256},
-    "Shuffle-Heavy / Wide": {"memory_multiplier": 4.0, "gb_per_core": 5.0, "target_partition_mb": 256},
-    "ML / UDF-Heavy": {"memory_multiplier": 3.0, "gb_per_core": 4.0, "target_partition_mb": 128},
+    "Simple ETL / Reads": {
+        "memory_multiplier": 1.5,
+        "gb_per_core": 2.0,
+        "target_partition_mb": 256,
+    },
+    "Joins / Aggregations": {
+        "memory_multiplier": 2.5,
+        "gb_per_core": 3.5,
+        "target_partition_mb": 256,
+    },
+    "Shuffle-Heavy / Wide": {
+        "memory_multiplier": 4.0,
+        "gb_per_core": 5.0,
+        "target_partition_mb": 256,
+    },
+    "ML / UDF-Heavy": {
+        "memory_multiplier": 3.0,
+        "gb_per_core": 4.0,
+        "target_partition_mb": 128,
+    },
 }
 
 FILE_FORMATS = {
@@ -51,59 +67,59 @@ FILE_FORMATS = {
 # -----------------------
 AZURE_CATALOG = [
     # Dv3 (≈4 GiB/vCPU)
-    {"cloud": "Azure", "name": "Standard_D4s_v3",   "memory_gb": 16,   "cores": 4},
-    {"cloud": "Azure", "name": "Standard_D8s_v3",   "memory_gb": 32,   "cores": 8},
-    {"cloud": "Azure", "name": "Standard_D16s_v3",  "memory_gb": 64,   "cores": 16},
-    {"cloud": "Azure", "name": "Standard_D32s_v3",  "memory_gb": 128,  "cores": 32},
-    {"cloud": "Azure", "name": "Standard_D64s_v3",  "memory_gb": 256,  "cores": 64},
+    {"cloud": "Azure", "name": "Standard_D4s_v3", "memory_gb": 16, "cores": 4},
+    {"cloud": "Azure", "name": "Standard_D8s_v3", "memory_gb": 32, "cores": 8},
+    {"cloud": "Azure", "name": "Standard_D16s_v3", "memory_gb": 64, "cores": 16},
+    {"cloud": "Azure", "name": "Standard_D32s_v3", "memory_gb": 128, "cores": 32},
+    {"cloud": "Azure", "name": "Standard_D64s_v3", "memory_gb": 256, "cores": 64},
     # Dv5 (≈4 GiB/vCPU)
-    {"cloud": "Azure", "name": "Standard_D8s_v5",   "memory_gb": 32,   "cores": 8},
-    {"cloud": "Azure", "name": "Standard_D16s_v5",  "memory_gb": 64,   "cores": 16},
-    {"cloud": "Azure", "name": "Standard_D32s_v5",  "memory_gb": 128,  "cores": 32},
-    {"cloud": "Azure", "name": "Standard_D48s_v5",  "memory_gb": 192,  "cores": 48},
-    {"cloud": "Azure", "name": "Standard_D64s_v5",  "memory_gb": 256,  "cores": 64},
+    {"cloud": "Azure", "name": "Standard_D8s_v5", "memory_gb": 32, "cores": 8},
+    {"cloud": "Azure", "name": "Standard_D16s_v5", "memory_gb": 64, "cores": 16},
+    {"cloud": "Azure", "name": "Standard_D32s_v5", "memory_gb": 128, "cores": 32},
+    {"cloud": "Azure", "name": "Standard_D48s_v5", "memory_gb": 192, "cores": 48},
+    {"cloud": "Azure", "name": "Standard_D64s_v5", "memory_gb": 256, "cores": 64},
     # Ev3 (≈8 GiB/vCPU; E64s_v3 is 432 GiB)
-    {"cloud": "Azure", "name": "Standard_E4s_v3",   "memory_gb": 32,   "cores": 4},
-    {"cloud": "Azure", "name": "Standard_E8s_v3",   "memory_gb": 64,   "cores": 8},
-    {"cloud": "Azure", "name": "Standard_E16s_v3",  "memory_gb": 128,  "cores": 16},
-    {"cloud": "Azure", "name": "Standard_E32s_v3",  "memory_gb": 256,  "cores": 32},
-    {"cloud": "Azure", "name": "Standard_E64s_v3",  "memory_gb": 432,  "cores": 64},
+    {"cloud": "Azure", "name": "Standard_E4s_v3", "memory_gb": 32, "cores": 4},
+    {"cloud": "Azure", "name": "Standard_E8s_v3", "memory_gb": 64, "cores": 8},
+    {"cloud": "Azure", "name": "Standard_E16s_v3", "memory_gb": 128, "cores": 16},
+    {"cloud": "Azure", "name": "Standard_E32s_v3", "memory_gb": 256, "cores": 32},
+    {"cloud": "Azure", "name": "Standard_E64s_v3", "memory_gb": 432, "cores": 64},
     # Ebdsv5 (≈8 GiB/vCPU, local NVMe)
-    {"cloud": "Azure", "name": "Standard_E8bds_v5",  "memory_gb": 64,   "cores": 8},
-    {"cloud": "Azure", "name": "Standard_E16bds_v5", "memory_gb": 128,  "cores": 16},
-    {"cloud": "Azure", "name": "Standard_E32bds_v5", "memory_gb": 256,  "cores": 32},
-    {"cloud": "Azure", "name": "Standard_E48bds_v5", "memory_gb": 384,  "cores": 48},
-    {"cloud": "Azure", "name": "Standard_E64bds_v5", "memory_gb": 512,  "cores": 64},
+    {"cloud": "Azure", "name": "Standard_E8bds_v5", "memory_gb": 64, "cores": 8},
+    {"cloud": "Azure", "name": "Standard_E16bds_v5", "memory_gb": 128, "cores": 16},
+    {"cloud": "Azure", "name": "Standard_E32bds_v5", "memory_gb": 256, "cores": 32},
+    {"cloud": "Azure", "name": "Standard_E48bds_v5", "memory_gb": 384, "cores": 48},
+    {"cloud": "Azure", "name": "Standard_E64bds_v5", "memory_gb": 512, "cores": 64},
     # Fsv2 (≈2 GiB/vCPU)
-    {"cloud": "Azure", "name": "Standard_F8s_v2",   "memory_gb": 16,   "cores": 8},
-    {"cloud": "Azure", "name": "Standard_F16s_v2",  "memory_gb": 32,   "cores": 16},
-    {"cloud": "Azure", "name": "Standard_F32s_v2",  "memory_gb": 64,   "cores": 32},
-    {"cloud": "Azure", "name": "Standard_F48s_v2",  "memory_gb": 96,   "cores": 48},
-    {"cloud": "Azure", "name": "Standard_F72s_v2",  "memory_gb": 144,  "cores": 72},
+    {"cloud": "Azure", "name": "Standard_F8s_v2", "memory_gb": 16, "cores": 8},
+    {"cloud": "Azure", "name": "Standard_F16s_v2", "memory_gb": 32, "cores": 16},
+    {"cloud": "Azure", "name": "Standard_F32s_v2", "memory_gb": 64, "cores": 32},
+    {"cloud": "Azure", "name": "Standard_F48s_v2", "memory_gb": 96, "cores": 48},
+    {"cloud": "Azure", "name": "Standard_F72s_v2", "memory_gb": 144, "cores": 72},
     # Lsv2 (≈8 GiB/vCPU, storage-optimized with NVMe)
-    {"cloud": "Azure", "name": "Standard_L8s_v2",   "memory_gb": 64,   "cores": 8},
-    {"cloud": "Azure", "name": "Standard_L16s_v2",  "memory_gb": 128,  "cores": 16},
-    {"cloud": "Azure", "name": "Standard_L32s_v2",  "memory_gb": 256,  "cores": 32},
-    {"cloud": "Azure", "name": "Standard_L48s_v2",  "memory_gb": 384,  "cores": 48},
-    {"cloud": "Azure", "name": "Standard_L64s_v2",  "memory_gb": 512,  "cores": 64},
-    {"cloud": "Azure", "name": "Standard_L80s_v2",  "memory_gb": 640,  "cores": 80},
+    {"cloud": "Azure", "name": "Standard_L8s_v2", "memory_gb": 64, "cores": 8},
+    {"cloud": "Azure", "name": "Standard_L16s_v2", "memory_gb": 128, "cores": 16},
+    {"cloud": "Azure", "name": "Standard_L32s_v2", "memory_gb": 256, "cores": 32},
+    {"cloud": "Azure", "name": "Standard_L48s_v2", "memory_gb": 384, "cores": 48},
+    {"cloud": "Azure", "name": "Standard_L64s_v2", "memory_gb": 512, "cores": 64},
+    {"cloud": "Azure", "name": "Standard_L80s_v2", "memory_gb": 640, "cores": 80},
 ]
 
 AWS_CATALOG = [
-    {"cloud": "AWS", "name": "m5d.2xlarge",  "memory_gb": 32,   "cores": 8},
-    {"cloud": "AWS", "name": "m5d.4xlarge",  "memory_gb": 64,   "cores": 16},
-    {"cloud": "AWS", "name": "m5d.8xlarge",  "memory_gb": 128,  "cores": 32},
-    {"cloud": "AWS", "name": "m5d.12xlarge", "memory_gb": 192,  "cores": 48},
-    {"cloud": "AWS", "name": "m5d.24xlarge", "memory_gb": 384,  "cores": 96},
-    {"cloud": "AWS", "name": "r5d.2xlarge",  "memory_gb": 64,   "cores": 8},
-    {"cloud": "AWS", "name": "r5d.4xlarge",  "memory_gb": 128,  "cores": 16},
-    {"cloud": "AWS", "name": "r5d.8xlarge",  "memory_gb": 256,  "cores": 32},
-    {"cloud": "AWS", "name": "r5d.12xlarge", "memory_gb": 384,  "cores": 48},
-    {"cloud": "AWS", "name": "r5d.24xlarge", "memory_gb": 768,  "cores": 96},
-    {"cloud": "AWS", "name": "i3.2xlarge",   "memory_gb": 61,   "cores": 8},
-    {"cloud": "AWS", "name": "i3.4xlarge",   "memory_gb": 122,  "cores": 16},
-    {"cloud": "AWS", "name": "i3.8xlarge",   "memory_gb": 244,  "cores": 32},
-    {"cloud": "AWS", "name": "i3.16xlarge",  "memory_gb": 488,  "cores": 64},
+    {"cloud": "AWS", "name": "m5d.2xlarge", "memory_gb": 32, "cores": 8},
+    {"cloud": "AWS", "name": "m5d.4xlarge", "memory_gb": 64, "cores": 16},
+    {"cloud": "AWS", "name": "m5d.8xlarge", "memory_gb": 128, "cores": 32},
+    {"cloud": "AWS", "name": "m5d.12xlarge", "memory_gb": 192, "cores": 48},
+    {"cloud": "AWS", "name": "m5d.24xlarge", "memory_gb": 384, "cores": 96},
+    {"cloud": "AWS", "name": "r5d.2xlarge", "memory_gb": 64, "cores": 8},
+    {"cloud": "AWS", "name": "r5d.4xlarge", "memory_gb": 128, "cores": 16},
+    {"cloud": "AWS", "name": "r5d.8xlarge", "memory_gb": 256, "cores": 32},
+    {"cloud": "AWS", "name": "r5d.12xlarge", "memory_gb": 384, "cores": 48},
+    {"cloud": "AWS", "name": "r5d.24xlarge", "memory_gb": 768, "cores": 96},
+    {"cloud": "AWS", "name": "i3.2xlarge", "memory_gb": 61, "cores": 8},
+    {"cloud": "AWS", "name": "i3.4xlarge", "memory_gb": 122, "cores": 16},
+    {"cloud": "AWS", "name": "i3.8xlarge", "memory_gb": 244, "cores": 32},
+    {"cloud": "AWS", "name": "i3.16xlarge", "memory_gb": 488, "cores": 64},
 ]
 
 BUILTIN_CATALOG = {"Azure": AZURE_CATALOG, "AWS": AWS_CATALOG}
@@ -115,14 +131,17 @@ DEFAULTS = {
     "memory_overhead_frac": 0.12,
 }
 
+
 # -----------------------
 # 🧮 Helper functions
 # -----------------------
 def ceil_div(a: float, b: float) -> int:
     return int(math.ceil(a / b))
 
+
 def partitions_for_data(size_gb: float, part_mb: int) -> int:
     return max(1, ceil_div(size_gb * 1024, part_mb))
+
 
 def executors_layout(
     cores_per_node: int,
@@ -152,6 +171,7 @@ def executors_layout(
         "executor_memory_gb": round(executor_heap_gb, 1),
     }
 
+
 def spark_conf_from_layout(
     total_execs: int,
     exec_cores: int,
@@ -162,7 +182,9 @@ def spark_conf_from_layout(
     enable_dynamic_allocation: bool = True,
 ) -> Dict[str, str]:
     total_cores = max(1, total_execs * max(1, exec_cores))
-    default_parallelism = min(20000, max(2 * total_cores, part_count))  # cap to avoid pathological values
+    default_parallelism = min(
+        20000, max(2 * total_cores, part_count)
+    )  # cap to avoid pathological values
     shuffle_partitions = min(20000, max(2 * total_cores, part_count), 4 * total_cores)
     bytes_per_part = part_mb * 1024 * 1024
     advisory_bytes = advisory_mb * 1024 * 1024
@@ -194,10 +216,16 @@ def spark_conf_from_layout(
         conf["spark.executor.instances"] = str(total_execs)
     return conf
 
+
 def filter_catalog(catalog: List[Dict], families: List[str]) -> List[Dict]:
     if families:
-        return [c for c in catalog if any(c["name"].lower().startswith(fam.lower()) for fam in families)]
+        return [
+            c
+            for c in catalog
+            if any(c["name"].lower().startswith(fam.lower()) for fam in families)
+        ]
     return catalog
+
 
 # Cloud-aware helpers for family identification
 def _azure_family(name: str) -> str:
@@ -207,14 +235,18 @@ def _azure_family(name: str) -> str:
         return f"{parts[0]}_{parts[1][0]}"
     return parts[0]
 
+
 def _aws_family(name: str) -> str:
     # "m5d.2xlarge" -> "m5d"
     return name.split(".")[0]
 
+
 # -----------------------
 # 🖼️ UI
 # -----------------------
-st.set_page_config(page_title="Spark Cluster Recommender", page_icon="🧠", layout="wide")
+st.set_page_config(
+    page_title="Spark Cluster Recommender", page_icon="🧠", layout="wide"
+)
 st.title("🧠 Spark Cluster Recommender")
 
 # Sidebar: cloud & catalog source (API is placeholder)
@@ -227,7 +259,9 @@ catalog_source = st.sidebar.radio(
     index=0,
 )
 if catalog_source == "Databricks API (placeholder)":
-    st.sidebar.info("API loading is disabled for now. Switch to the built-in catalog, or wire up the API later.")
+    st.sidebar.info(
+        "API loading is disabled for now. Switch to the built-in catalog, or wire up the API later."
+    )
 
 # Sidebar: filters
 st.sidebar.markdown("---")
@@ -240,7 +274,7 @@ else:
 family_filter = st.sidebar.multiselect(
     "Filter by family/prefix",
     options=family_options,
-    help="Examples: Standard_E, Standard_D (Azure) · m5d, r5d (AWS)"
+    help="Examples: Standard_E, Standard_D (Azure) · m5d, r5d (AWS)",
 )
 
 INSTANCE_CATALOG: List[Dict] = filter_catalog(working_catalog, family_filter)
@@ -248,23 +282,59 @@ INSTANCE_CATALOG: List[Dict] = filter_catalog(working_catalog, family_filter)
 left, right = st.columns([1.3, 1])
 with left:
     st.header("📥 Inputs")
-    data_size_gb = st.number_input("Input Data Size (GB)", value=250, min_value=1,
-                                   help="Logical size of input read by the job (uncompressed).")
-    file_fmt = st.selectbox("Input Format", list(FILE_FORMATS.keys()), index=0,
-                            help="Impacts partition size & memory multiplier (CSV/JSON heavier).")
-    workload = st.selectbox("Workload Type", list(WORKLOAD_PRESETS.keys()), index=1,
-                            help="Sets GB heap per core & working-set multiplier.")
-    waves = st.slider("Waves (batches of tasks)", 1, 6, 2,
-                      help="total_cores ≈ partitions / waves. 2–3 is typical.")
-    optimize_for = st.radio("Optimize for", ["Balanced", "Memory", "CPU"], index=0, horizontal=True,
-                            help="Choose which constraint drives worker count when memory vs CPU differ.")
+    data_size_gb = st.number_input(
+        "Input Data Size (GB)",
+        value=250,
+        min_value=1,
+        help="Logical size of input read by the job (uncompressed).",
+    )
+    file_fmt = st.selectbox(
+        "Input Format",
+        list(FILE_FORMATS.keys()),
+        index=0,
+        help="Impacts partition size & memory multiplier (CSV/JSON heavier).",
+    )
+    workload = st.selectbox(
+        "Workload Type",
+        list(WORKLOAD_PRESETS.keys()),
+        index=1,
+        help="Sets GB heap per core & working-set multiplier.",
+    )
+    waves = st.slider(
+        "Waves (batches of tasks)",
+        1,
+        6,
+        2,
+        help="total_cores ≈ partitions / waves. 2–3 is typical.",
+    )
+    optimize_for = st.radio(
+        "Optimize for",
+        ["Balanced", "Memory", "CPU"],
+        index=0,
+        horizontal=True,
+        help="Choose which constraint drives worker count when memory vs CPU differ.",
+    )
 
     with st.expander("Optional: Caching & Headroom"):
         caching = st.toggle("Cache a major dataset?", value=False)
-        cache_size_gb = st.number_input("Estimated cache size (GB)", value=0, min_value=0,
-                                        help="Add if you will persist a DataFrame in memory.") if caching else 0
-        skew = st.slider("Skew/headroom factor", 1.0, 2.0, 1.1, 0.05,
-                         help="Multiply memory target to account for data skew or spikes.")
+        cache_size_gb = (
+            st.number_input(
+                "Estimated cache size (GB)",
+                value=0,
+                min_value=0,
+                help="Add if you will persist a DataFrame in memory.",
+            )
+            if caching
+            else 0
+        )
+        skew = st.slider(
+            "Skew/headroom factor",
+            1.0,
+            2.0,
+            1.1,
+            0.05,
+            help="Multiply memory target to account for data skew or spikes.",
+        )
 
     with st.expander("Advanced Layout & Overrides"):
         st.markdown(
@@ -278,12 +348,39 @@ with left:
 - **Dynamic allocation**: let Spark scale executors during the job.
             """
         )
-        reserve_cores = st.number_input("Reserve cores/node", value=DEFAULTS["reserve_cores_per_node"], min_value=0, max_value=8)
-        reserve_mem = st.number_input("Reserve mem/node (GB)", value=DEFAULTS["reserve_mem_gb_per_node"], min_value=0, max_value=64)
-        cores_per_exec = st.number_input("Cores per executor", value=DEFAULTS["cores_per_executor"], min_value=1, max_value=32)
-        overhead_frac = st.slider("Memory overhead % (off-heap)", 5, 40, int(DEFAULTS["memory_overhead_frac"] * 100)) / 100.0
-        gb_per_core_override = st.number_input("Heap GB per core (override)", value=0.0, min_value=0.0, step=0.5)
-        target_part_mb_override = st.number_input("Target partition size (MB, override)", value=0, min_value=0, step=64)
+        reserve_cores = st.number_input(
+            "Reserve cores/node",
+            value=DEFAULTS["reserve_cores_per_node"],
+            min_value=0,
+            max_value=8,
+        )
+        reserve_mem = st.number_input(
+            "Reserve mem/node (GB)",
+            value=DEFAULTS["reserve_mem_gb_per_node"],
+            min_value=0,
+            max_value=64,
+        )
+        cores_per_exec = st.number_input(
+            "Cores per executor",
+            value=DEFAULTS["cores_per_executor"],
+            min_value=1,
+            max_value=32,
+        )
+        overhead_frac = (
+            st.slider(
+                "Memory overhead % (off-heap)",
+                5,
+                40,
+                int(DEFAULTS["memory_overhead_frac"] * 100),
+            )
+            / 100.0
+        )
+        gb_per_core_override = st.number_input(
+            "Heap GB per core (override)", value=0.0, min_value=0.0, step=0.5
+        )
+        target_part_mb_override = st.number_input(
+            "Target partition size (MB, override)", value=0, min_value=0, step=64
+        )
         dyn_alloc = st.toggle("Enable Dynamic Allocation", value=True)
 
 with right:
@@ -298,12 +395,16 @@ with right:
 - We fit executors into instances and pick the smallest worker count meeting CPU & memory for your objective.
         """
     )
-    st.caption("Tune via metrics: spilling → more heap; long GC → fewer cores/executor; starvation → more cores or fewer waves.")
+    st.caption(
+        "Tune via metrics: spilling → more heap; long GC → fewer cores/executor; starvation → more cores or fewer waves."
+    )
 
 # Partition sizing
 preset = WORKLOAD_PRESETS[workload]
 fmt = FILE_FORMATS[file_fmt]
-part_mb = target_part_mb_override if target_part_mb_override > 0 else fmt["partition_mb"]
+part_mb = (
+    target_part_mb_override if target_part_mb_override > 0 else fmt["partition_mb"]
+)
 num_partitions = partitions_for_data(data_size_gb, part_mb)
 advisory_mb = max(part_mb * 2, 512)  # AQE target partition size (post-shuffle)
 
@@ -312,7 +413,9 @@ total_cores_target = max(4, ceil_div(num_partitions, max(1, waves)))
 
 # Memory sizing
 mem_mult = preset["memory_multiplier"] * fmt["mem_multiplier_adj"] * skew
-gb_per_core = gb_per_core_override if gb_per_core_override > 0 else preset["gb_per_core"]
+gb_per_core = (
+    gb_per_core_override if gb_per_core_override > 0 else preset["gb_per_core"]
+)
 mem_req_by_input = (data_size_gb * mem_mult) + (cache_size_gb if caching else 0)
 mem_req_by_core = total_cores_target * gb_per_core
 min_total_memory_gb = max(mem_req_by_input, mem_req_by_core)
@@ -320,10 +423,21 @@ min_total_memory_gb = max(mem_req_by_input, mem_req_by_core)
 st.markdown("---")
 st.header("🧮 Estimated Requirements")
 c1, c2, c3 = st.columns(3)
-c1.metric("Minimum total memory (GB)", f"{int(math.ceil(min_total_memory_gb))}",
-          help=f"Working set ≈ {mem_mult:.2f}× input + cache; also ≥ {gb_per_core} GB/core")
-c2.metric("Target total cores", f"{total_cores_target}", help=f"Cores ≈ partitions / waves (waves={waves})")
-c3.metric("Target input partitions", f"{num_partitions}", help=f"~{part_mb} MB file split; AQE advisory ~{advisory_mb} MB")
+c1.metric(
+    "Minimum total memory (GB)",
+    f"{int(math.ceil(min_total_memory_gb))}",
+    help=f"Working set ≈ {mem_mult:.2f}× input + cache; also ≥ {gb_per_core} GB/core",
+)
+c2.metric(
+    "Target total cores",
+    f"{total_cores_target}",
+    help=f"Cores ≈ partitions / waves (waves={waves})",
+)
+c3.metric(
+    "Target input partitions",
+    f"{num_partitions}",
+    help=f"~{part_mb} MB file split; AQE advisory ~{advisory_mb} MB",
+)
 
 # -----------------------
 # 🔎 Candidate Search
@@ -369,38 +483,48 @@ for inst in INSTANCE_CATALOG:
     meets_cores = total_cores >= total_cores_target
 
     limiting = (
-        "Memory" if nodes == nodes_for_memory and nodes_for_memory >= nodes_for_cpu else
-        "CPU" if nodes == nodes_for_cpu and nodes_for_cpu >= nodes_for_memory else
-        ("Memory" if nodes_for_memory > nodes_for_cpu else "CPU")
+        "Memory"
+        if nodes == nodes_for_memory and nodes_for_memory >= nodes_for_cpu
+        else (
+            "CPU"
+            if nodes == nodes_for_cpu and nodes_for_cpu >= nodes_for_memory
+            else ("Memory" if nodes_for_memory > nodes_for_cpu else "CPU")
+        )
     )
 
-    conf = spark_conf_from_layout(
-        total_execs=total_execs,
-        exec_cores=exec_cores,
-        exec_mem_gb=exec_heap_gb,
-        part_count=num_partitions,
-        part_mb=part_mb,
-        advisory_mb=advisory_mb,
-        enable_dynamic_allocation=dyn_alloc,
-    ) if total_execs > 0 else {}
+    conf = (
+        spark_conf_from_layout(
+            total_execs=total_execs,
+            exec_cores=exec_cores,
+            exec_mem_gb=exec_heap_gb,
+            part_count=num_partitions,
+            part_mb=part_mb,
+            advisory_mb=advisory_mb,
+            enable_dynamic_allocation=dyn_alloc,
+        )
+        if total_execs > 0
+        else {}
+    )
 
-    rows.append({
-        "Cloud": cloud_choice,
-        "Instance": inst["name"],
-        "Workers": int(nodes),
-        "Workers by memory": int(nodes_for_memory),
-        "Workers by CPU": int(nodes_for_cpu),
-        "Limiting": limiting,
-        "Execs / node": int(execs_per_node),
-        "Exec cores": int(exec_cores),
-        "Exec memory (GB)": exec_heap_gb,
-        "Total executors": int(total_execs),
-        "Total cores": int(total_cores),
-        "Total exec heap (GB)": total_exec_heap,
-        "Meets memory": meets_mem,
-        "Meets cores": meets_cores,
-        "_conf": conf,
-    })
+    rows.append(
+        {
+            "Cloud": cloud_choice,
+            "Instance": inst["name"],
+            "Workers": int(nodes),
+            "Workers by memory": int(nodes_for_memory),
+            "Workers by CPU": int(nodes_for_cpu),
+            "Limiting": limiting,
+            "Execs / node": int(execs_per_node),
+            "Exec cores": int(exec_cores),
+            "Exec memory (GB)": exec_heap_gb,
+            "Total executors": int(total_execs),
+            "Total cores": int(total_cores),
+            "Total exec heap (GB)": total_exec_heap,
+            "Meets memory": meets_mem,
+            "Meets cores": meets_cores,
+            "_conf": conf,
+        }
+    )
 
 candidates = pd.DataFrame(rows)
 
@@ -409,9 +533,13 @@ st.header("📈 Recommendation")
 
 if candidates.empty:
     if not INSTANCE_CATALOG:
-        st.warning("No instances in catalog. Adjust the family filter or switch clouds.")
+        st.warning(
+            "No instances in catalog. Adjust the family filter or switch clouds."
+        )
     else:
-        st.warning("No candidates computed. Check inputs and expand your instance catalog.")
+        st.warning(
+            "No candidates computed. Check inputs and expand your instance catalog."
+        )
 else:
     candidates.sort_values(by=["Workers", "Total cores"], inplace=True)
     feasible = candidates[(candidates["Meets memory"]) & (candidates["Meets cores"])]
@@ -419,7 +547,9 @@ else:
     best = table.iloc[0]
 
     if feasible.empty:
-        st.info("None of the instances meet both CPU and memory targets. Showing the closest fit.")
+        st.info(
+            "None of the instances meet both CPU and memory targets. Showing the closest fit."
+        )
 
     st.subheader("✅ Suggested Cluster")
     st.write(
@@ -428,11 +558,17 @@ else:
     )
 
     # Worker rationale
-    w_mem, w_cpu, w_chosen = int(best["Workers by memory"]), int(best["Workers by CPU"]), int(best["Workers"])
+    w_mem, w_cpu, w_chosen = (
+        int(best["Workers by memory"]),
+        int(best["Workers by CPU"]),
+        int(best["Workers"]),
+    )
     colw1, colw2, colw3 = st.columns(3)
     colw1.metric("Workers (by memory)", w_mem)
     colw2.metric("Workers (by CPU)", w_cpu)
-    colw3.metric("Chosen workers", w_chosen, help=f"Limiting factor: {best['Limiting']}")
+    colw3.metric(
+        "Chosen workers", w_chosen, help=f"Limiting factor: {best['Limiting']}"
+    )
 
     # Autoscaling hints
     execs_per_node = max(1, int(best["Execs / node"]))
@@ -444,7 +580,9 @@ else:
         min_workers = ceil_div(min_execs, execs_per_node)
         init_workers = ceil_div(init_execs, execs_per_node)
         max_workers = ceil_div(max_execs, execs_per_node)
-        st.caption(f"Databricks autoscaling → **min_workers={min_workers}**, **initial≈{init_workers}**, **max_workers={max_workers}**")
+        st.caption(
+            f"Databricks autoscaling → **min_workers={min_workers}**, **initial≈{init_workers}**, **max_workers={max_workers}**"
+        )
     else:
         st.caption(f"Databricks fixed workers → **{w_chosen}**")
 
@@ -457,7 +595,9 @@ else:
     # executor memoryOverhead from overhead fraction (use the int heap set in conf to avoid overcommit)
     try:
         exec_heap_gb_int = max(1, int(math.floor(best["Exec memory (GB)"])))
-        mem_overhead_mb = int(round(exec_heap_gb_int * (overhead_frac / (1 - overhead_frac)) * 1024))
+        mem_overhead_mb = int(
+            round(exec_heap_gb_int * (overhead_frac / (1 - overhead_frac)) * 1024)
+        )
         _conf["spark.executor.memoryOverhead"] = str(max(384, mem_overhead_mb))
     except Exception:
         pass
@@ -465,8 +605,12 @@ else:
     if dyn_alloc:
         total_execs = int(best["Total executors"])
         _conf["spark.dynamicAllocation.shuffleTracking.enabled"] = "true"
-        _conf["spark.dynamicAllocation.minExecutors"] = str(max(1, int(total_execs * 0.2)))
-        _conf["spark.dynamicAllocation.initialExecutors"] = str(max(1, int(total_execs * 0.5)))
+        _conf["spark.dynamicAllocation.minExecutors"] = str(
+            max(1, int(total_execs * 0.2))
+        )
+        _conf["spark.dynamicAllocation.initialExecutors"] = str(
+            max(1, int(total_execs * 0.5))
+        )
         _conf["spark.dynamicAllocation.maxExecutors"] = str(total_execs)
 
     order = [
@@ -495,15 +639,21 @@ else:
         "spark.executor.extraJavaOptions",
         "spark.driver.extraJavaOptions",
     ]
-    lines = [f"{k} {_conf[k]}" for k in order if k in _conf] + \
-            [f"{k} {_conf[k]}" for k in sorted(_conf.keys()) if k not in order]
+    lines = [f"{k} {_conf[k]}" for k in order if k in _conf] + [
+        f"{k} {_conf[k]}" for k in sorted(_conf.keys()) if k not in order
+    ]
 
-    use_crlf = st.toggle("Windows line endings (CRLF)", value=False,
-                         help="Enable if pasting into a tool that collapses LF-only newlines.")
+    use_crlf = st.toggle(
+        "Windows line endings (CRLF)",
+        value=False,
+        help="Enable if pasting into a tool that collapses LF-only newlines.",
+    )
     conf_text = ("\r\n" if use_crlf else "\n").join(lines)
 
     st.text_area("spark-defaults.conf", value=conf_text, height=260)
-    st.download_button("Download spark-defaults.conf", conf_text, file_name="spark-defaults.conf")
+    st.download_button(
+        "Download spark-defaults.conf", conf_text, file_name="spark-defaults.conf"
+    )
 
     with st.expander("📘 What these configs do (quick tips)"):
         st.markdown(CONFIG_TIPS_MD)
@@ -514,13 +664,17 @@ else:
         st.code(f"spark-submit \\\n{flags}", language="bash")
 
         st.markdown("**Databricks JSON (cluster spec)**")
-        st.code(json.dumps({"spark_conf": {k: str(v) for k, v in _conf.items()}}, indent=2), language="json")
+        st.code(
+            json.dumps({"spark_conf": {k: str(v) for k, v in _conf.items()}}, indent=2),
+            language="json",
+        )
 
     # -----------------------
     # 📋 Run plan summary
     # -----------------------
     with st.expander("📋 Run plan summary", expanded=True):
-        st.markdown(f"""
+        st.markdown(
+            f"""
 - **Cloud**: **{cloud_choice}**
 - **Input**: **{data_size_gb} GB** {file_fmt} · Workload: **{workload}**
 - **Partitions**: **{num_partitions}** (~{part_mb} MB file split; AQE advisory ~{advisory_mb} MB) · **Waves**: {waves}
@@ -528,18 +682,30 @@ else:
 - **Cluster**: **{best['Instance']} × {int(best['Workers'])}** workers (limiting: **{best['Limiting']}**)
 - **Executors**: **{int(best['Total executors'])}** total — {int(best['Execs / node'])}/node · {int(best['Exec cores'])} cores/executor · {best['Exec memory (GB)']} GB heap/executor
 - **Shuffle partitions**: **{_conf['spark.sql.shuffle.partitions']}** · **Dynamic allocation**: **{str(dyn_alloc).lower()}**
-        """)
+        """
+        )
 
     # -----------------------
     # 📊 Candidates table (highlight selection)
     # -----------------------
     st.subheader("🔎 Candidates (sorted by workers, then cores)")
     display_cols = [
-        "Cloud", "Instance", "Workers", "Workers by memory", "Workers by CPU",
-        "Limiting", "Execs / node", "Exec cores", "Exec memory (GB)",
-        "Total executors", "Total cores", "Total exec heap (GB)", "Meets memory", "Meets cores"
+        "Cloud",
+        "Instance",
+        "Workers",
+        "Workers by memory",
+        "Workers by CPU",
+        "Limiting",
+        "Execs / node",
+        "Exec cores",
+        "Exec memory (GB)",
+        "Total executors",
+        "Total cores",
+        "Total exec heap (GB)",
+        "Meets memory",
+        "Meets cores",
     ]
-    candidates["Selected"] = (candidates.index == best.name)
+    candidates["Selected"] = candidates.index == best.name
     show = candidates[display_cols + ["Selected"]].copy()
     show.loc[:, "Selected"] = show["Selected"].map(lambda x: "★" if x else "")
     st.dataframe(show, use_container_width=True)

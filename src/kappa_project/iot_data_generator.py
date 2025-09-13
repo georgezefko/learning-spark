@@ -7,14 +7,14 @@ import random
 import time
 from datetime import datetime
 from confluent_kafka import Producer
-import os
+
 
 # Function to generate fake telemetry data
 def generate_telemetry(device_id):
     # Base telemetry with slight tendency to degrade over time
     base_vibration = random.uniform(0.1, 2.0)  # Normal baseline
     anomaly_chance = random.random()
-    
+
     return {
         "device_id": device_id,
         "timestamp": datetime.utcnow().isoformat(),
@@ -22,53 +22,65 @@ def generate_telemetry(device_id):
         "temperature": round(random.uniform(18.0, 30.0), 1),
         "vibration": round(
             base_vibration + (3.0 if anomaly_chance > 0.95 else 0),  # Occasional spikes
-            1
+            1,
         ),
-        "signal_strength": random.randint(70, 100)  # New field for connectivity
+        "signal_strength": random.randint(70, 100),  # New field for connectivity
     }
+
 
 # Function to generate fake event data
 def generate_event(device_id):
     event_type = random.choices(
         ["failure", "maintenance", "inspection"],
         weights=[0.1, 0.3, 0.6],  # More inspections, fewer failures
-        k=1
+        k=1,
     )[0]
-    
+
     base_event = {
         "device_id": device_id,
         "event_timestamp": datetime.utcnow().isoformat(),
         "event_type": event_type,
-        "severity": random.choice(["low", "medium", "high"])
+        "severity": random.choice(["low", "medium", "high"]),
     }
-    
+
     # Type-specific fields
     if event_type == "failure":
-        base_event.update({
-            "error_code": f"ERR{random.randint(1000, 1999)}",
-            "component": random.choice(["motor", "bearing", "sensor", "battery"]),
-            "root_cause": random.choice(["overheating", "wear", "power_surge", "unknown"])
-        })
+        base_event.update(
+            {
+                "error_code": f"ERR{random.randint(1000, 1999)}",
+                "component": random.choice(["motor", "bearing", "sensor", "battery"]),
+                "root_cause": random.choice(
+                    ["overheating", "wear", "power_surge", "unknown"]
+                ),
+            }
+        )
     elif event_type == "maintenance":
-        base_event.update({
-            "technician": f"tech-{random.randint(1, 20)}",
-            "duration_min": random.randint(15, 240),
-            "parts_replaced": random.choice([None, "bearing", "filter", "battery"])
-        })
+        base_event.update(
+            {
+                "technician": f"tech-{random.randint(1, 20)}",
+                "duration_min": random.randint(15, 240),
+                "parts_replaced": random.choice([None, "bearing", "filter", "battery"]),
+            }
+        )
     else:  # inspection
-        base_event.update({
-            "status": random.choice(["passed", "passed", "failed"]),  # 2:1 pass ratio
-            "next_inspection_days": random.randint(7, 30)
-        })
-    
+        base_event.update(
+            {
+                "status": random.choice(
+                    ["passed", "passed", "failed"]
+                ),  # 2:1 pass ratio
+                "next_inspection_days": random.randint(7, 30),
+            }
+        )
+
     return base_event
+
 
 # Function to deliver reports (callback)
 def delivery_report(err, msg):
     if err is not None:
-        print(f'Message delivery failed: {err}')
+        print(f"Message delivery failed: {err}")
     else:
-        print(f'Message delivered to {msg.topic()} [{msg.partition()}]')
+        print(f"Message delivered to {msg.topic()} [{msg.partition()}]")
 
 
 def load_data(*args, **kwargs):
@@ -82,17 +94,17 @@ def load_data(*args, **kwargs):
 
     # Kafka configuration
     conf = {
-        'bootstrap.servers': "localhost:9092",  # Kafka broker address
-        'client.id': 'iot-data-producer',
-        "on_delivery": delivery_report
+        "bootstrap.servers": "localhost:9092",  # Kafka broker address
+        "client.id": "iot-data-producer",
+        "on_delivery": delivery_report,
     }
 
     # Create a Kafka producer
     producer = Producer(conf)
 
     # Topics to send data to
-    telemetry_topic = 'iot-telemetry'
-    events_topic = 'iot-events'
+    telemetry_topic = "iot-telemetry"
+    events_topic = "iot-events"
 
     # Simulate IoT devices sending data
     device_ids = [f"device_{i}" for i in range(1, 11)]  # Simulate 10 devices
@@ -104,7 +116,7 @@ def load_data(*args, **kwargs):
                 telemetry_topic,
                 key=device_id,
                 value=json.dumps(telemetry_data),
-                on_delivery=delivery_report
+                on_delivery=delivery_report,
             )
 
             # Generate and send event data (less frequently)
@@ -114,7 +126,7 @@ def load_data(*args, **kwargs):
                     events_topic,
                     key=device_id,
                     value=json.dumps(event_data),
-                    on_delivery=delivery_report
+                    on_delivery=delivery_report,
                 )
 
             producer.poll(0)
@@ -123,5 +135,5 @@ def load_data(*args, **kwargs):
     return {}
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     load_data()

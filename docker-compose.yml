@@ -1,6 +1,6 @@
 version: '3'
 services:
- 
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
@@ -45,7 +45,7 @@ services:
     networks:
       - spark_network
 
-  
+
   starrocks-fe-0:
     image: starrocks/fe-ubuntu:latest
     hostname: starrocks-fe-0

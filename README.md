@@ -65,7 +65,7 @@ pyspark --version
 uv run python main.py
 uv run python streaming.py
 ```
-<!-- 
+<!--
 ### Optional: Docker services (MinIO/Kafka/Postgres/Redis)
 If you want S3-like storage, Kafka streams, or a SQL database locally, use the provided Docker Compose stack and helper Make targets. See `README-Docker.md` for details.
 
