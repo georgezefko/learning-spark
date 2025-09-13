@@ -1,0 +1,124 @@
+version: '3'
+services:
+ 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - spark_network
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:latest
+    hostname: schema-registry
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+      SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8081
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9093,PLAINTEXT_INTERNAL://localhost:9092
+      SCHEMA_REGISTRY_DEBUG: 'true'
+    networks:
+      - spark_network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "9092:9092"
+    expose:
+      - "9093"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9093,PLAINTEXT_INTERNAL://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - spark_network
+
+  
+  starrocks-fe-0:
+    image: starrocks/fe-ubuntu:latest
+    hostname: starrocks-fe-0
+    container_name: starrocks-fe-0
+    command:
+      - /bin/bash
+      - -c
+      - |
+        /opt/starrocks/fe_entrypoint.sh starrocks-fe-0
+    environment:
+      - HOST_TYPE=FQDN
+      - TZ=Asia/Shanghai
+      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
+    ports:
+      - "8030:8030"
+      - "9020:9020"
+      - "9030:9030"
+    volumes:
+       - singleton_fe0_data:/opt/starrocks/fe/meta
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9030"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks:
+      - spark_network
+
+  starrocks-be-0:
+    image: starrocks/be-ubuntu:latest
+    hostname: starrocks-be-0
+    container_name: starrocks-be-0
+    command:
+      - /bin/bash
+      - -c
+      - |
+        /opt/starrocks/be_entrypoint.sh starrocks-fe-0
+    environment:
+      - HOST_TYPE=FQDN
+      - TZ=Asia/Shanghai
+    ports:
+      - "8040:8040"
+    depends_on:
+      - starrocks-fe-0
+    volumes:
+      - singleton_be0_data:/opt/starrocks/be/storage
+    networks:
+      - spark_network
+  superset:
+    image: apache/superset:latest
+    container_name: superset
+    ports:
+      - "8088:8088"
+    environment:
+      - SUPERSET_SECRET_KEY=12345ab@
+      - SUPERSET_DATABASE_URI=sqlite:////app/superset_home/superset.db
+    volumes:
+      - superset_home:/app/superset_home
+      - ./superset_config.py:/app/pythonpath/superset_config.py
+    command: >
+      /bin/sh -c "superset db upgrade &&
+      superset fab create-admin --username admin --firstname Superset --lastname Admin --password admin --email admin@superset.com &&
+      superset init &&
+      superset run -h 0.0.0.0 -p 8088 --with-threads --reload --debugger"
+    restart: unless-stopped
+    networks:
+      - spark_network
+
+networks:
+  spark_network:
+    driver: bridge
+
+volumes:
+  singleton_fe0_data:
+  singleton_be0_data:
+  superset_home:
