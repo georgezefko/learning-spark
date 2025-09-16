@@ -94,7 +94,7 @@ def load_data(*args, **kwargs):
 
     # Kafka configuration
     conf = {
-        "bootstrap.servers": "localhost:9092",  # Kafka broker address
+        "bootstrap.servers": "kafka:9093",  # Kafka broker address
         "client.id": "iot-data-producer",
         "on_delivery": delivery_report,
     }

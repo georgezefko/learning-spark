@@ -94,6 +94,37 @@ services:
       - singleton_be0_data:/opt/starrocks/be/storage
     networks:
       - spark_network
+
+  minio:
+    container_name: minio
+    image: quay.io/minio/minio
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - './minio_data:/data'
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
+      - MINIO_DOMAIN=storage
+      - MINIO_REGION_NAME=us-east-1
+      - MINIO_REGION=us-east-1
+    command: server --console-address ":9001" /data
+    networks:
+      - spark_network
+
+  minio-client:
+    image: minio/mc:latest
+    container_name: minio-client
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until (mc alias set myminio http://minio:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY); do echo 'waiting for minio...'; sleep 3; done;
+      mc mb myminio/spark-demo/stream-1/checkpoints;
+      "
+    networks:
+      - spark_network
   superset:
     image: apache/superset:latest
     container_name: superset
@@ -114,11 +145,88 @@ services:
     networks:
       - spark_network
 
+
+  spark-connect:
+    image: apache/spark:4.0.1
+    container_name: spark-connect
+    command:
+      - /opt/spark/sbin/start-connect-server.sh
+      - --packages
+      - org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.1,org.apache.hadoop:hadoop-aws:3.3.6,com.amazonaws:aws-java-sdk-bundle:1.12.262
+      - --conf
+      - spark.hadoop.fs.s3a.aws.credentials.provider=org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider
+      - --conf
+      - spark.connect.grpc.binding.host=0.0.0.0
+      - --conf
+      - spark.connect.grpc.binding.port=15002
+      - --conf
+      - spark.jars.ivy=/tmp/ivy
+      - --conf
+      - spark.hadoop.fs.s3a.endpoint=http://minio:9000
+      - --conf
+      - spark.hadoop.fs.s3a.path.style.access=true
+      - --conf
+      - spark.hadoop.fs.s3a.connection.ssl.enabled=false
+      - --conf
+      - spark.hadoop.fs.s3a.access.key=${MINIO_ACCESS_KEY}
+      - --conf
+      - spark.hadoop.fs.s3a.secret.key=${MINIO_SECRET_KEY}
+      - --conf
+      - spark.sql.shuffle.partitions=4
+    environment:
+      - SPARK_NO_DAEMONIZE=true
+    ports:
+      - "15002:15002"
+    volumes:
+      - spark-warehouse:/opt/spark/warehouse
+      - spark-checkpoints:/tmp/spark-checkpoints
+      # 🔥 remove the ivy volume to avoid perms issues
+      # - spark-ivy:/home/spark/.ivy2
+    depends_on:
+      - kafka
+      - schema-registry
+      - minio
+    networks:
+      - spark_network
+
+
+
+  dev:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    container_name: dev
+    command: sleep infinity
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:cached
+      - conf:/opt/spark/conf
+      - uv-cache:/root/.cache/uv
+      - spark-warehouse:/opt/spark/warehouse
+    environment:
+      PYSPARK_PYTHON: /usr/local/bin/python
+      SPARK_LOCAL_IP: dev
+      SPARK_NO_DAEMONIZE: "true"
+      # point Spark/Kafka clients to the in-cluster listener
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BROKERS}
+      SCHEMA_REGISTRY_URL: ${KAFKA_SCHEMA_REGISTRY}
+      MINIO_ENDPOINT: http://minio:9000
+      SPARK_CONNECT_URL: sc://spark-connect:15002
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    depends_on: [kafka, schema-registry, minio, spark-connect]
+    networks: [spark_network]
+
 networks:
   spark_network:
     driver: bridge
+    external: false
 
 volumes:
   singleton_fe0_data:
   singleton_be0_data:
   superset_home:
+  uv-cache:
+  spark-warehouse:
+  spark-checkpoints:
+  conf:

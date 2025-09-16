@@ -7,6 +7,11 @@ spark_config:
 	cd src/spark_configuration
 	streamlit run main.py
 
+# Activate environment
+
+activate:
+	source .venv/bin/activate
+
 # Run the containers in the background
 up:
 	docker-compose -f $(COMPOSE_FILE) up -d

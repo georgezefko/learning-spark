@@ -15,4 +15,8 @@ dependencies = [
     "pyarrow>=10.0.0",
     "streamlit>=1.49.1",
     "confluent-kafka>=2.11.1",
+    "python-dotenv>=1.1.1",
+    "grpcio>=1.74.0",
+    "grpcio-status>=1.74.0",
+    "make>=0.1.6.post2",
 ]

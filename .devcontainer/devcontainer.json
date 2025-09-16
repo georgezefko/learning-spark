@@ -1,0 +1,33 @@
+{
+  "name": "spark-pyspark-dev",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "dev",
+  "runServices": [
+    "zookeeper", "kafka", "schema-registry",
+    "minio", "starrocks-fe-0", "starrocks-be-0", "superset",
+    "spark-connect"
+  ],
+  "workspaceFolder": "/workspace",
+  "overrideCommand": false,
+  "updateRemoteUserUID": true,
+  "envFile": "../.env",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "GitHub.copilot",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      }
+    }
+  },
+
+  "postCreateCommand": "true",
+  "mounts": [
+    "source=uv-cache,target=/root/.cache/uv,type=volume"
+  ]
+}
