@@ -147,12 +147,13 @@ services:
 
 
   spark-connect:
-    image: apache/spark:4.0.1
+    build: ./spark-connect
+    #image: apache/spark:4.0.1
     container_name: spark-connect
     command:
       - /opt/spark/sbin/start-connect-server.sh
       - --packages
-      - org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.1,org.apache.hadoop:hadoop-aws:3.3.6,com.amazonaws:aws-java-sdk-bundle:1.12.262
+      - org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.1,org.apache.hadoop:hadoop-aws:3.3.6,com.amazonaws:aws-java-sdk-bundle:1.12.262,com.mysql:mysql-connector-j:8.0.33
       - --conf
       - spark.hadoop.fs.s3a.aws.credentials.provider=org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider
       - --conf
@@ -180,8 +181,6 @@ services:
     volumes:
       - spark-warehouse:/opt/spark/warehouse
       - spark-checkpoints:/tmp/spark-checkpoints
-      # 🔥 remove the ivy volume to avoid perms issues
-      # - spark-ivy:/home/spark/.ivy2
     depends_on:
       - kafka
       - schema-registry
@@ -204,7 +203,7 @@ services:
       - uv-cache:/root/.cache/uv
       - spark-warehouse:/opt/spark/warehouse
     environment:
-      PYSPARK_PYTHON: /usr/local/bin/python
+      PYSPARK_PYTHON: /opt/venv/bin/python
       SPARK_LOCAL_IP: dev
       SPARK_NO_DAEMONIZE: "true"
       # point Spark/Kafka clients to the in-cluster listener
