@@ -8,7 +8,7 @@ import os
 # Config
 # =======================
 CONNECT_URL = os.getenv("SPARK_CONNECT_URL", "sc://spark-connect:15002")
-KAFKA_BOOTSTRAP = os.environ.get("KAFKA_BROKERS", "localhost:9092")
+KAFKA_BOOTSTRAP = os.environ.get("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 KAFKA_TOPIC = "iot-telemetry"
 
 STARROCKS_FE = "starrocks-fe:8030"  # FE HTTP port for stream load
@@ -59,7 +59,7 @@ raw = (
     .option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP)
     .option("subscribe", KAFKA_TOPIC)
     .option("startingOffsets", "latest")
-    # .option("failOnDataLoss", False)
+    .option("failOnDataLoss", False)
     .load()
     # .select(F.from_json(F.col("value").cast("string"), telemetry_schema).alias("j"))
     # .select("j.*")
@@ -104,8 +104,8 @@ agg5 = (
     .dropDuplicates(["device_id", "event_time"])
     .groupBy(F.window("event_time", "5 minutes").alias("w"), F.col("device_id"))
     .agg(
-        F.count_distinct(F.date_trunc("minute", F.col("event_time"))).alias(
-            "cnt_minutes"
+        F.approx_count_distinct(F.date_trunc("minute", F.col("event_time"))).alias(
+            "cnt_points"
         ),
         F.avg("temperature").alias("avg_temperature"),
         F.min("temperature").alias("min_temperature"),
@@ -143,7 +143,7 @@ enriched = (
         "window_start",
         "window_end",
         "device_id",
-        F.col("cnt_minutes").alias("cnt_points"),
+        "cnt_points",
         "avg_temperature",
         "min_temperature",
         "max_temperature",

@@ -9,11 +9,13 @@ from datetime import datetime, timezone
 from confluent_kafka import Producer
 import os
 
+# load_dotenv()
+
 NUM_DEVICES = 10
 EVENTS_PER_SECOND = 10  # total across all devices
 LATE_PROB = 0.0  # set to e.g. 0.05 to send 5% late events
 LATE_MAX_SECONDS = 180  # max lateness for late events
-KAFKA_BOOTSTRAP = os.environ.get("KAFKA_BROKERS", "localhost:9092")
+KAFKA_BOOTSTRAP = os.environ.get("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 
 
 def now_iso_utc_ms():
@@ -36,7 +38,7 @@ def iso_utc_ms_from_epoch(ts: float):
 # Function to generate fake telemetry data
 def generate_telemetry(device_id):
     # Base telemetry with slight tendency to degrade over time
-    temp = round(random.uniform(-5.0, 50.0), 1)
+    temp = round(random.uniform(0.0, 40.0), 1)
 
     # optionally send a late timestamp to demo watermarking
     if LATE_PROB > 0 and random.random() < LATE_PROB:
