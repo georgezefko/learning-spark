@@ -13,3 +13,4 @@ wheels/
 jars/
 minio_data/
 .ruff_cahce/
+.env
