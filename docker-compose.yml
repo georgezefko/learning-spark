@@ -148,7 +148,6 @@ services:
 
   spark-connect:
     build: ./spark-connect
-    #image: apache/spark:4.0.1
     container_name: spark-connect
     command:
       - /opt/spark/sbin/start-connect-server.sh
@@ -203,10 +202,9 @@ services:
       - uv-cache:/root/.cache/uv
       - spark-warehouse:/opt/spark/warehouse
     environment:
-      PYSPARK_PYTHON: /opt/venv/bin/python
+      PYSPARK_PYTHON: /workspace/.venv/bin/python
       SPARK_LOCAL_IP: dev
       SPARK_NO_DAEMONIZE: "true"
-      # point Spark/Kafka clients to the in-cluster listener
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BROKERS}
       SCHEMA_REGISTRY_URL: ${KAFKA_SCHEMA_REGISTRY}
       MINIO_ENDPOINT: http://minio:9000

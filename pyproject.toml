@@ -20,3 +20,7 @@ dependencies = [
     "grpcio-status>=1.74.0",
     "make>=0.1.6.post2",
 ]
+[tool.uv]  # or wherever you put dev deps
+dev-dependencies = [
+  "pre-commit>=3.7",
+]

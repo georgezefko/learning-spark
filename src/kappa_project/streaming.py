@@ -59,7 +59,7 @@ raw = (
     .option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP)
     .option("subscribe", KAFKA_TOPIC)
     .option("startingOffsets", "latest")
-    .option("failOnDataLoss", False)
+    # .option("failOnDataLoss", False)
     .load()
     # .select(F.from_json(F.col("value").cast("string"), telemetry_schema).alias("j"))
     # .select("j.*")
@@ -101,9 +101,12 @@ dim_b = F.broadcast(dim_device)
 # =======================
 agg5 = (
     telemetry.withWatermark("event_time", WATERMARK)
+    .dropDuplicates(["device_id", "event_time"])
     .groupBy(F.window("event_time", "5 minutes").alias("w"), F.col("device_id"))
     .agg(
-        F.count("*").alias("cnt_points"),
+        F.count_distinct(F.date_trunc("minute", F.col("event_time"))).alias(
+            "cnt_minutes"
+        ),
         F.avg("temperature").alias("avg_temperature"),
         F.min("temperature").alias("min_temperature"),
         F.max("temperature").alias("max_temperature"),
@@ -140,7 +143,7 @@ enriched = (
         "window_start",
         "window_end",
         "device_id",
-        "cnt_points",
+        F.col("cnt_minutes").alias("cnt_points"),
         "avg_temperature",
         "min_temperature",
         "max_temperature",
@@ -153,25 +156,6 @@ enriched = (
         "updated_at",
     )
 )
-
-# =======================
-# StarRocks Stream Load (upsert by PK)
-# =======================
-# def stream_load_jsonl(jsonl_bytes: bytes, label: str):
-#     url = f"http://{STARROCKS_FE}/api/{SR_DB}/{SR_TABLE}/_stream_load"
-#     headers = {
-#         "label": label,              # idempotent per batch
-#         "format": "json",
-#         "jsonpaths": "[]",
-#         "strip_outer_array": "false",
-#         "merge_type": "MERGE",       # PK upsert
-#     }
-#     resp = requests.put(url, data=jsonl_bytes, headers=headers, timeout=60)
-#     if resp.status_code != 200:
-#         raise RuntimeError(f"Stream Load HTTP {resp.status_code}: {resp.text}")
-#     jr = resp.json()
-#     if jr.get("Status") not in ("Success", "Publish Timeout", "OK"):
-#         raise RuntimeError(f"Stream Load failed: {jr}")
 
 
 def upsert_to_starrocks(batch_df, batch_id: int):

@@ -21,7 +21,7 @@
         "ms-azuretools.vscode-docker"
       ],
       "settings": {
-        "python.defaultInterpreterPath": "/usr/local/bin/python"
+        "python.defaultInterpreterPath": "/workspace/.venv/bin/python"
       }
     }
   },
