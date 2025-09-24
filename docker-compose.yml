@@ -160,6 +160,10 @@ services:
       - --conf
       - spark.connect.grpc.binding.port=15002
       - --conf
+      - spark.ui.enabled=true
+      - --conf
+      - spark.ui.port=4040
+      - --conf
       - spark.jars.ivy=/tmp/ivy
       - --conf
       - spark.hadoop.fs.s3a.endpoint=http://minio:9000
@@ -177,6 +181,7 @@ services:
       - SPARK_NO_DAEMONIZE=true
     ports:
       - "15002:15002"
+      - "4040-4045:4040-4045"
     volumes:
       - spark-warehouse:/opt/spark/warehouse
       - spark-checkpoints:/tmp/spark-checkpoints
