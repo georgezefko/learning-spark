@@ -37,7 +37,7 @@
     }
   },
 
-  "postCreateCommand": "uv sync --locked --no-dev",
+  "postCreateCommand": "uv sync --locked  && uv run pre-commit install",
   "mounts": [
     "source=uv-cache,target=/root/.cache/uv,type=volume"
   ]

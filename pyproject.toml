@@ -20,7 +20,56 @@ dependencies = [
     "grpcio-status>=1.74.0",
     "make>=0.1.6.post2",
 ]
-[tool.uv]  # or wherever you put dev deps
-dev-dependencies = [
-  "pre-commit>=3.7",
+
+[dependency-groups]
+# Installed by default in dev with `uv sync` (see [tool.uv] below)
+dev = [
+    "pre-commit==4.2.0",
+    "black",
+    "pytest",
+    "ruff",
+    "isort",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+# Include your package files (adjust paths as needed)
+include = ["*.py", "src/**/*.py"]
+
+# ----------------------------
+# Tool configuration
+# ----------------------------
+
+[tool.uv]
+# Make `uv sync` include the "dev" group by default in your devcontainer
+default-groups = ["dev"]
+
+[tool.ruff]
+# Lint + (optionally) format with Ruff
+line-length = 90
+target-version = "py310"
+# Enable Pyflakes + pycodestyle subset + import sorting
+select = ["E", "F", "I"]
+ignore = ["F821", "E402"]
+exclude = [".git", "__pycache__", "build", "dist", "setup.py"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.black]
+line-length = 90
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
