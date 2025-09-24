@@ -26,16 +26,15 @@ WATERMARK = "3 minutes"  # per your 2–3 min ask
 
 # 1) Build local SparkSession
 spark = (
-    SparkSession.builder.remote(CONNECT_URL)
-    .appName("LocalKafkaStreaming")
-    .config("fs.s3a.threads.keepalivetime", "60000")  # 60 seconds = 60000 ms
-    .config(
-        "spark.hadoop.fs.s3a.aws.credentials.provider",
-        "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider",
-    )
-    .config("fs.s3a.connection.establish.timeout", "30000")
-    .config("fs.s3a.connection.timeout", "200000")
-    .config("fs.s3a.multipart.purge.age", "86400000")
+    SparkSession.builder.remote(CONNECT_URL).appName("LocalKafkaStreaming")
+    # .config("fs.s3a.threads.keepalivetime", "60000")  # 60 seconds = 60000 ms
+    # .config(
+    #     "spark.hadoop.fs.s3a.aws.credentials.provider",
+    #     "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider",
+    # )
+    # .config("fs.s3a.connection.establish.timeout", "30000")
+    # .config("fs.s3a.connection.timeout", "200000")
+    # .config("fs.s3a.multipart.purge.age", "86400000")
     .getOrCreate()
 )
 

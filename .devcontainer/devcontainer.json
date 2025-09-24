@@ -7,6 +7,16 @@
     "minio", "starrocks-fe-0", "starrocks-be-0", "superset",
     "spark-connect"
   ],
+  "features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"moby": "false",
+			"azureDnsAutoDetection": "false",
+			"installDockerBuildx": "false",
+			"installDockerComposeSwitch": "false",
+			"version": "latest",
+			"dockerDashComposeVersion": "latest"
+		}
+	},
   "workspaceFolder": "/workspace",
   "overrideCommand": false,
   "updateRemoteUserUID": true,
@@ -21,12 +31,13 @@
         "ms-azuretools.vscode-docker"
       ],
       "settings": {
-        "python.defaultInterpreterPath": "/workspace/.venv/bin/python"
+        "python.defaultInterpreterPath": "/workspace/.venv/bin/python",
+        "python.terminal.activateEnvironment": true
       }
     }
   },
 
-  "postCreateCommand": "true",
+  "postCreateCommand": "uv sync --locked --no-dev",
   "mounts": [
     "source=uv-cache,target=/root/.cache/uv,type=volume"
   ]
