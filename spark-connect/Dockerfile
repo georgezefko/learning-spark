@@ -13,9 +13,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ln -sf /usr/bin/python3 /usr/bin/python && \
     rm -rf /var/lib/apt/lists/*
 
+
+ENV PYSPARK_PYTHON=/usr/bin/python3
+ENV PYSPARK_DRIVER_PYTHON=/usr/bin/python3
+
 COPY ./conf/spark-defaults.conf "$SPARK_HOME/conf/spark-defaults.conf"
 COPY ./conf/core-site.xml "$SPARK_HOME/conf/core-site.xml"
 
 # Tell Spark which Python to use for workers
-ENV PYSPARK_PYTHON=/usr/bin/python3
-ENV PYSPARK_DRIVER_PYTHON=/usr/bin/python3

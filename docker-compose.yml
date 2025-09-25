@@ -185,13 +185,10 @@ services:
     working_dir: /workspace
     volumes:
       - .:/workspace:cached
-      - conf:/opt/spark/conf
       - uv-cache:/root/.cache/uv
       - spark-warehouse:/opt/spark/warehouse
     environment:
       PYSPARK_PYTHON: /workspace/.venv/bin/python
-      SPARK_LOCAL_IP: dev
-      SPARK_NO_DAEMONIZE: "true"
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BROKERS}
       SCHEMA_REGISTRY_URL: ${KAFKA_SCHEMA_REGISTRY}
       MINIO_ENDPOINT: http://minio:9000

@@ -2,8 +2,7 @@ FROM python:3.12-slim
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/root/.local/bin:/workspace/.venv/bin:${PATH}" \
-    UV_LINK_MODE=copy  \
-    UV_PIP_FLAGS="--only-binary=:all:"
+    UV_LINK_MODE=copy
 
 # check uv container
 
@@ -13,9 +12,6 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get install -y --no-install-recommends \
       curl bash git ca-certificates procps \
     && rm -rf /var/lib/apt/lists/*
-
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-ENV PYSPARK_PYTHON=/workspace/.venv/bin/python
 
 # uv package manager
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -34,6 +30,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-dev
 
 # Ensure venv comes first
-ENV PATH="/workspace/.venv/bin:${PATH}"
+#ENV PATH="/workspace/.venv/bin:${PATH}"
+
+ENV PYSPARK_PYTHON=/workspace/.venv/bin/python \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
 ENTRYPOINT []
