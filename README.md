@@ -91,6 +91,12 @@ export SPARK_HOME="/path/to/spark"
 export PATH="$SPARK_HOME/bin:$PATH"
 ```
 
+Verify:
+```bash
+spark-shell --version
+pyspark --version
+```
+
 **Run examples:**
 ```bash
 # Start optional data services only if you need them
