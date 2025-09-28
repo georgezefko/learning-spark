@@ -43,20 +43,11 @@ Notes:
    ```bash
    docker compose up -d
    ```
-4. Inside the dev container terminal:
-   ```bash
-   uv sync
+4. Test spark connect by running:
    ```
-5. Connect to Spark from Python using Spark Connect:
-   ```python
-   from pyspark.sql import SparkSession
-
-   spark = (SparkSession
-            .builder
-            .remote("sc://spark-connect:15002")
-            .getOrCreate())
-
-   print(spark.range(1, 5).collect())
+   make run_spark
+   or
+   python src/main.py data/mnm_dataset.csv
    ```
 
 ### Option B: Local-first with uv (no Docker/Dev Containers)
@@ -103,11 +94,10 @@ export PATH="$SPARK_HOME/bin:$PATH"
 **Run examples:**
 ```bash
 # Start optional data services only if you need them
-make start
+make up
 
 # Run local scripts
-uv run python main.py
-uv run python src/kappa_project/streaming.py
+uv run python src/main.py data/mnm_dataset.py
 ```
 
 **Note**: `uv` automatically manages the virtual environment - no need to manually activate/deactivate!
@@ -165,33 +155,6 @@ make browse
 
 ---
 
-## Working with Spark from Python
-
-Inside the dev container:
-```bash
-uv sync
-uv run python - <<'PY'
-from pyspark.sql import SparkSession
-
-spark = (SparkSession
-         .builder
-         .remote("sc://spark-connect:15002")
-         .getOrCreate())
-
-print(spark.range(1, 10).selectExpr("id * 2 as v").toPandas())
-PY
-```
-
-To run repo scripts:
-```bash
-uv run python src/kappa_project/streaming.py
-uv run python src/kappa_project/iot_data_generator.py
-```
-
-MinIO is available as `s3a://` with endpoint/config set in Spark defaults. A default bucket path for checkpoints is created at startup: `myminio/spark-demo/stream-1/checkpoints`.
-
----
-
 ## Data and connectors
 
 - Local sample data: `data/mm_dataset.csv`
@@ -223,17 +186,8 @@ MinIO is available as `s3a://` with endpoint/config set in Spark defaults. A def
 │  └─ conf/
 │     ├─ core-site.xml
 │     └─ spark-defaults.conf
-├─ src/kappa_project/
-│  ├─ streaming.py
-│  ├─ iot_data_generator.py
-│  └─ schemas/db_schema.sql
+├─ src/
+│  ├─ main.py
 ├─ data/mm_dataset.csv
-├─ jars/
 └─ Makefile
 ```
-
----
-
-## License
-
-MIT (or your preferred license).
