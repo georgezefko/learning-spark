@@ -1,7 +1,7 @@
 import sys
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import count
-import time
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -9,10 +9,23 @@ if __name__ == "__main__":
         sys.exit(-1)
     # Build a SparkSession using the SparkSession APIs.
     # If one does not exist, then create an instance. There # can only be one SparkSession per JVM.
+    # spark = (
+    #     SparkSession.builder.appName("PythonMnMCount")
+    #     .config("spark.ui.enabled", "true")  # ensure UI is on
+    #     .config("spark.ui.port", "4040")
+    #     .getOrCreate()
+    # )
+
     spark = (
-        SparkSession.builder.appName("PythonMnMCount")
-        .config("spark.ui.enabled", "true")  # ensure UI is on
-        .config("spark.ui.port", "4040")
+        SparkSession.builder.remote("sc://spark-connect:15002").appName("learning-spark")
+        # .config("fs.s3a.threads.keepalivetime", "60000")  # 60 seconds = 60000 ms
+        # .config(
+        #     "spark.hadoop.fs.s3a.aws.credentials.provider",
+        #     "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider",
+        # )
+        # .config("fs.s3a.connection.establish.timeout", "30000")
+        # .config("fs.s3a.connection.timeout", "200000")
+        # .config("fs.s3a.multipart.purge.age", "86400000")
         .getOrCreate()
     )
     # Get the M&M data set filename from the command-line arguments
@@ -63,7 +76,7 @@ if __name__ == "__main__":
     # Show the resulting aggregation for California.
     # As above, show() is an action that will trigger the execution of the # entire computation.
     ca_count_mnm_df.show(n=10, truncate=False)
-    print("Job finished; UI will remain up for 5 minutes...")
-    time.sleep(300)
+    # print("Job finished; UI will remain up for 5 minutes...")
+    # time.sleep(300)
     # Stop the SparkSession
     spark.stop()

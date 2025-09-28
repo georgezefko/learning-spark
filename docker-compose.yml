@@ -165,6 +165,7 @@ services:
       - "15002:15002"
       - "4040-4045:4040-4045"
     volumes:
+      - ./data:/opt/spark/work-dir/data
       - spark-warehouse:/opt/spark/warehouse
       - spark-checkpoints:/tmp/spark-checkpoints
     depends_on:
