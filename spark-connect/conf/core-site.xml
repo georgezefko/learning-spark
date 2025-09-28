@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<configuration>
+  <property>
+    <name>fs.s3a.aws.credentials.provider</name>
+    <value>org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider</value>
+  </property>
+  <property>
+    <name>fs.s3a.connection.establish.timeout</name>
+    <value>30000</value>
+  </property>
+  <property>
+    <name>fs.s3a.connection.timeout</name>
+    <value>200000</value>
+  </property>
+  <property>
+    <name>fs.s3a.threads.keepalivetime</name>
+    <value>60000</value>
+  </property>
+  <property>
+    <name>fs.s3a.multipart.purge.age</name>
+    <value>86400000</value>
+  </property>
+</configuration>

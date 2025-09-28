@@ -8,3 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+
+jars/
+minio_data/
+.ruff_cahce/
+.env
+minio_data/
