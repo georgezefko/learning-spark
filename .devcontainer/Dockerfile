@@ -36,7 +36,7 @@ ENV PYSPARK_PYTHON=/workspace/.venv/bin/python \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-# 👇 Add this line for auto-activation in interactive shells
+# [OPTIONAL] This line is for auto-activation in interactive shells
 RUN echo "source /workspace/.venv/bin/activate" >> /root/.bashrc
 
 ENTRYPOINT []

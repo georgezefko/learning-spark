@@ -2,7 +2,7 @@
 COMPOSE_FILE = docker-compose.yml
 
 
-#Run Spark Configutation tool
+#Run Spark script
 run_spark:
 	python src/main.py data/mm_dataset.csv
 
@@ -32,4 +32,3 @@ browse:
 
 unit-tests:
 	@echo "Running unit tests..."
-	cd mage && python -m pytest tests/unit
