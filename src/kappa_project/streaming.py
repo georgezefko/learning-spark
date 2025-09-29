@@ -1,8 +1,8 @@
+import os
+
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
-import os
-
 
 # =======================
 # Config
@@ -26,16 +26,7 @@ WATERMARK = "3 minutes"  # per your 2–3 min ask
 
 # 1) Build local SparkSession
 spark = (
-    SparkSession.builder.remote(CONNECT_URL).appName("LocalKafkaStreaming")
-    # .config("fs.s3a.threads.keepalivetime", "60000")  # 60 seconds = 60000 ms
-    # .config(
-    #     "spark.hadoop.fs.s3a.aws.credentials.provider",
-    #     "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider",
-    # )
-    # .config("fs.s3a.connection.establish.timeout", "30000")
-    # .config("fs.s3a.connection.timeout", "200000")
-    # .config("fs.s3a.multipart.purge.age", "86400000")
-    .getOrCreate()
+    SparkSession.builder.remote(CONNECT_URL).appName("LocalKafkaStreaming").getOrCreate()
 )
 
 # Define the schema of payloads
@@ -133,9 +124,7 @@ enriched = (
     )
     .withColumn(
         "anomaly_reason",
-        F.when(F.col("anomaly_flag"), F.lit("MAX_TEMP>THRESHOLD")).otherwise(
-            F.lit(None)
-        ),
+        F.when(F.col("anomaly_flag"), F.lit("MAX_TEMP>THRESHOLD")).otherwise(F.lit(None)),
     )
     .withColumn("updated_at", F.current_timestamp())
     .select(

@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-      curl bash git ca-certificates procps \
+      curl make bash git ca-certificates procps \
     && rm -rf /var/lib/apt/lists/*
 
 # uv package manager
