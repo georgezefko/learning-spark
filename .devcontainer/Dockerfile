@@ -20,7 +20,7 @@ WORKDIR /workspace
 
 COPY pyproject.toml uv.lock ./
 
-# 1) Create venv and install ONLY dependencies
+# Create venv and install ONLY dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv && uv sync --locked --no-install-project --no-dev
 
@@ -36,7 +36,7 @@ ENV PYSPARK_PYTHON=/workspace/.venv/bin/python \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-# 👇 Add this line for auto-activation in interactive shells
+# [OPTIONAL] This line is for auto-activation in interactive shells
 RUN echo "source /workspace/.venv/bin/activate" >> /root/.bashrc
 
 ENTRYPOINT []

@@ -37,6 +37,21 @@ INSERT INTO dim_device (device_id, temp_anomaly_threshold, location_id, model, s
 
 
 -- Aggregates for dashboard
+
+
+ALTER TABLE fact_telemetry_5min
+ADD COLUMN minutes_covered INT DEFAULT "0",
+ADD COLUMN cnt_events INT DEFAULT "0",
+ADD COLUMN incomplete_by_coverage BOOLEAN DEFAULT "FALSE",
+ADD COLUMN incomplete_by_volume   BOOLEAN DEFAULT "FALSE",
+ADD COLUMN events_total           INT DEFAULT "0",
+ADD COLUMN events_failure         INT DEFAULT "0",
+ADD COLUMN events_maintenance     INT DEFAULT "0",
+ADD COLUMN events_inspection      INT DEFAULT "0",
+ADD COLUMN events_sev_high        INT DEFAULT "0";
+
+
+
 CREATE TABLE IF NOT EXISTS fact_telemetry_5min (
   window_start DATETIME,
   window_end   DATETIME,
@@ -59,3 +74,22 @@ PROPERTIES (
     "enable_persistent_index" = "true",
     "replication_num" = "1"
 );
+
+
+CREATE TABLE IF NOT EXISTS fact_events_enriched (
+  event_id         STRING NOT NULL,
+  device_id        STRING NOT NULL,
+  event_time       DATETIME NOT NULL,
+  event_type       STRING,
+  severity         STRING,
+  tel_points_nearby INT,
+  avg_temp_nearby  DOUBLE,
+  min_temp_nearby  DOUBLE,
+  max_temp_nearby  DOUBLE,
+  location_id      STRING,
+  model            STRING,
+  updated_at       DATETIME DEFAULT NOW(),
+  PRIMARY KEY (event_id)
+)
+DISTRIBUTED BY HASH(event_id)
+PROPERTIES ("replication_num"="1");
