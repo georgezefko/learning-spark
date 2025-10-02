@@ -4,7 +4,6 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/root/.local/bin:/workspace/.venv/bin:${PATH}" \
     UV_LINK_MODE=copy
 
-# check uv container
 
 RUN --mount=type=cache,target=/var/cache/apt \
     set -eux; \

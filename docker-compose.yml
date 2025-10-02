@@ -125,6 +125,7 @@ services:
       "
     networks:
       - spark_network
+
   superset:
     image: apache/superset:latest
     container_name: superset
@@ -135,7 +136,8 @@ services:
       - SUPERSET_DATABASE_URI=sqlite:////app/superset_home/superset.db
     volumes:
       - superset_home:/app/superset_home
-      - ./superset_config.py:/app/pythonpath/superset_config.py
+      #- ./superset_config.py:/app/pythonpath/superset_config.py
+      - ./requirements.txt:/app/pythonpath/requirements.txt
     command: >
       /bin/sh -c "superset db upgrade &&
       superset fab create-admin --username admin --firstname Superset --lastname Admin --password admin --email admin@superset.com &&

@@ -4,6 +4,7 @@ STREAMING QUERIES
 
 */
 
+BEGIN
 -- Updated anomalies_streaming table
 -- Static dim
 CREATE TABLE IF NOT EXISTS dim_device (
@@ -39,6 +40,7 @@ INSERT INTO dim_device (device_id, temp_anomaly_threshold, location_id, model, s
 -- Aggregates for dashboard
 
 
+/*
 ALTER TABLE fact_telemetry_5min
 ADD COLUMN minutes_covered INT DEFAULT "0",
 ADD COLUMN cnt_events INT DEFAULT "0",
@@ -49,7 +51,7 @@ ADD COLUMN events_failure         INT DEFAULT "0",
 ADD COLUMN events_maintenance     INT DEFAULT "0",
 ADD COLUMN events_inspection      INT DEFAULT "0",
 ADD COLUMN events_sev_high        INT DEFAULT "0";
-
+*/
 
 
 CREATE TABLE IF NOT EXISTS fact_telemetry_5min (
@@ -66,6 +68,15 @@ CREATE TABLE IF NOT EXISTS fact_telemetry_5min (
   threshold_used  DOUBLE,
   location_id     STRING,
   model           STRING,
+  minutes_covered INT DEFAULT "0",
+  cnt_events INT DEFAULT "0",
+  incomplete_by_coverage BOOLEAN DEFAULT "FALSE",
+  incomplete_by_volume   BOOLEAN DEFAULT "FALSE",
+  events_total           INT DEFAULT "0",
+  events_failure         INT DEFAULT "0",
+  events_maintenance     INT DEFAULT "0",
+  events_inspection      INT DEFAULT "0",
+  events_sev_high        INT DEFAULT "0";
   updated_at      DATETIME DEFAULT NOW()
 )
 PRIMARY KEY(device_id, window_start)
@@ -75,7 +86,7 @@ PROPERTIES (
     "replication_num" = "1"
 );
 
-
+/*
 CREATE TABLE IF NOT EXISTS fact_events_enriched (
   event_id         STRING NOT NULL,
   device_id        STRING NOT NULL,
@@ -93,3 +104,6 @@ CREATE TABLE IF NOT EXISTS fact_events_enriched (
 )
 DISTRIBUTED BY HASH(event_id)
 PROPERTIES ("replication_num"="1");
+*/
+
+COMMIT;

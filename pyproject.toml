@@ -18,6 +18,7 @@ dependencies = [
     "python-dotenv>=1.1.1",
     "grpcio>=1.74.0",
     "grpcio-status>=1.74.0",
+    "pymysql>=1.1.2",
 ]
 
 [dependency-groups]

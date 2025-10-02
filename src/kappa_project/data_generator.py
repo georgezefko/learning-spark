@@ -15,8 +15,8 @@ EVENTS_EPS = float(os.getenv("EVENTS_PER_SEC", "1"))
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 TOPIC_TELEMETRY = os.getenv("TOPIC_TELEMETRY", "iot-telemetry")
 TOPIC_EVENTS = os.getenv("TOPIC_EVENTS", "iot-events")
-THRESH_MIN = float(os.getenv("THRESH_MIN", "70"))
-THRESH_MAX = float(os.getenv("THRESH_MAX", "90"))
+THRESH_MIN = float(os.getenv("THRESH_MIN", "10"))  # 70
+THRESH_MAX = float(os.getenv("THRESH_MAX", "40"))  # 90
 WINDOW_SECS = 300  # 5 min windows
 RANDOM_SEED = int(os.getenv("RANDOM_SEED", "42"))
 
