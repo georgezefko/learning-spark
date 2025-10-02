@@ -4,7 +4,10 @@ STREAMING QUERIES
 
 */
 
-BEGIN
+
+
+CREATE DATABASE IF NOT EXISTS kappa_analytics;
+USE kappa_analytics;
 -- Updated anomalies_streaming table
 -- Static dim
 CREATE TABLE IF NOT EXISTS dim_device (
@@ -70,13 +73,13 @@ CREATE TABLE IF NOT EXISTS fact_telemetry_5min (
   model           STRING,
   minutes_covered INT DEFAULT "0",
   cnt_events INT DEFAULT "0",
-  incomplete_by_coverage BOOLEAN DEFAULT "FALSE",
-  incomplete_by_volume   BOOLEAN DEFAULT "FALSE",
+  incomplete_by_coverage BOOLEAN DEFAULT FALSE,
+  incomplete_by_volume   BOOLEAN DEFAULT FALSE,
   events_total           INT DEFAULT "0",
   events_failure         INT DEFAULT "0",
   events_maintenance     INT DEFAULT "0",
   events_inspection      INT DEFAULT "0",
-  events_sev_high        INT DEFAULT "0";
+  events_sev_high        INT DEFAULT "0",
   updated_at      DATETIME DEFAULT NOW()
 )
 PRIMARY KEY(device_id, window_start)
@@ -105,5 +108,3 @@ CREATE TABLE IF NOT EXISTS fact_events_enriched (
 DISTRIBUTED BY HASH(event_id)
 PROPERTIES ("replication_num"="1");
 */
-
-COMMIT;

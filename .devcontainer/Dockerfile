@@ -10,6 +10,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update; \
     apt-get install -y --no-install-recommends \
       curl make bash git ca-certificates procps \
+      default-mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # uv package manager
