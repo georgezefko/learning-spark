@@ -1,43 +1,109 @@
 import os
+from dataclasses import dataclass
 
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
-# =======================
-# Config (env-overridable)
-# =======================
-CONNECT_URL = os.getenv("SPARK_CONNECT_URL", "sc://spark-connect:15002")
-KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
-TOPIC_TEL = os.getenv("TOPIC_TELEMETRY", "iot-telemetry")
-TOPIC_EVT = os.getenv("TOPIC_EVENTS", "iot-events")
+# # =======================
+# # Config (env-overridable)
+# # =======================
+# CONNECT_URL = os.getenv("SPARK_CONNECT_URL", "sc://spark-connect:15002")
+# KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+# TOPIC_TEL = os.getenv("TOPIC_TELEMETRY", "iot-telemetry")
+# TOPIC_EVT = os.getenv("TOPIC_EVENTS", "iot-events")
 
-STARROCKS_FE_HTTP = os.getenv(
-    "STARROCKS_FE_HTTP", "starrocks-fe:8030"
-)  # not used if JDBC
-SR_JDBC_URL = os.getenv("SR_JDBC_URL", "jdbc:mysql://starrocks-fe-0:9030/kappa_analytics")
-SR_DB = os.getenv("SR_DB", "kappa_analytics")
-SR_TABLE = os.getenv("SR_TABLE", "fact_telemetry_5min")
+# STARROCKS_FE_HTTP = os.getenv(
+#     "STARROCKS_FE_HTTP", "starrocks-fe:8030"
+# )  # not used if JDBC
+# SR_JDBC_URL = os.getenv("SR_JDBC_URL", "jdbc:mysql://starrocks-fe-0:9030/kappa_analytics")
+# SR_DB = os.getenv("SR_DB", "kappa_analytics")
+# SR_TABLE = os.getenv("SR_TABLE", "fact_telemetry_5min")
 
-CHECKPOINT_DIR = os.getenv("CHECKPOINT_DIR", "s3a://spark-demo/stream-1/checkpoints/")
-TRIGGER_EVERY = os.getenv("TRIGGER_EVERY", "30 seconds")
-WATERMARK = os.getenv("WATERMARK", "3 minutes")
-WINDOW = os.getenv("WINDOW", "5 minutes")
+# CHECKPOINT_DIR = os.getenv("CHECKPOINT_DIR", "s3a://spark-demo/stream-1/checkpoints/")
+# TRIGGER_EVERY = os.getenv("TRIGGER_EVERY", "30 seconds")
+# WATERMARK = os.getenv("WATERMARK", "3 minutes")
+# WINDOW = os.getenv("WINDOW", "5 minutes")
 
-# Completeness: expected points per device per 5-min window.
-# Set explicitly for the tutorial, e.g. TELEMETRY_EPS=10, NUM_DEVICES=10 -> ~300/10 = 30 per device per 5 min.
-EXPECTED_POINTS_PER_WINDOW = int(
-    os.getenv("EXPECTED_POINTS_PER_WINDOW", "30")
-)  # tweak in tutorial
-COMPLETENESS_TOLERANCE = float(
-    os.getenv("COMPLETENESS_TOLERANCE", "0.85")
-)  # 85% by default
+# # Completeness: expected points per device per 5-min window.
+# # Set explicitly for the tutorial, e.g. TELEMETRY_EPS=10, NUM_DEVICES=10 -> ~300/10 = 30 per device per 5 min.
+# EXPECTED_POINTS_PER_WINDOW = int(
+#     os.getenv("EXPECTED_POINTS_PER_WINDOW", "30")
+# )  # tweak in tutorial
+# COMPLETENESS_TOLERANCE = float(
+#     os.getenv("COMPLETENESS_TOLERANCE", "0.85")
+# )  # 85% by default
+
+
+@dataclass(frozen=True)
+class Settings:
+    connect_url: str = "sc://spark-connect:15002"
+    kafka_bootstrap: str = "localhost:9092"
+    topic_tel: str = "iot-telemetry"
+    topic_evt: str = "iot-events"
+
+    starrocks_fe_http: str = "starrocks-fe:8030"  # not used if JDBC
+    sr_jdbc_url: str = "jdbc:mysql://starrocks-fe-0:9030/kappa_analytics"
+    sr_db: str = "kappa_analytics"
+    sr_table: str = "fact_telemetry_5min"
+
+    checkpoint_dir: str = "s3a://spark-demo/stream-1/checkpoints/"
+    trigger_every: str = "30 seconds"
+    watermark: str = "3 minutes"
+    window: str = "5 minutes"
+
+    expected_points_per_window: int = 30
+    completeness_tolerance: float = 0.85
+
+    spark_shuffle_partitions: int = 8
+    sink_coalesce: int = 4
+    jdbc_batchsize: int = 5000
+
+    @property
+    def threshold_points(self) -> int:
+        return int(self.expected_points_per_window * self.completeness_tolerance)
+
+    @classmethod
+    def from_env(cls) -> "Settings":
+        def _get(name, default):
+            return os.getenv(name, str(default))
+
+        return cls(
+            connect_url=_get("SPARK_CONNECT_URL", cls.connect_url),
+            kafka_bootstrap=_get("KAFKA_BOOTSTRAP_SERVERS", cls.kafka_bootstrap),
+            topic_tel=_get("TOPIC_TELEMETRY", cls.topic_tel),
+            topic_evt=_get("TOPIC_EVENTS", cls.topic_evt),
+            starrocks_fe_http=_get("STARROCKS_FE_HTTP", cls.starrocks_fe_http),
+            sr_jdbc_url=_get("SR_JDBC_URL", cls.sr_jdbc_url),
+            sr_db=_get("SR_DB", cls.sr_db),
+            sr_table=_get("SR_TABLE", cls.sr_table),
+            checkpoint_dir=_get("CHECKPOINT_DIR", cls.checkpoint_dir),
+            trigger_every=_get("TRIGGER_EVERY", cls.trigger_every),
+            watermark=_get("WATERMARK", cls.watermark),
+            window=_get("WINDOW", cls.window),
+            expected_points_per_window=int(
+                _get("EXPECTED_POINTS_PER_WINDOW", cls.expected_points_per_window)
+            ),
+            completeness_tolerance=float(
+                _get("COMPLETENESS_TOLERANCE", cls.completeness_tolerance)
+            ),
+            spark_shuffle_partitions=int(
+                _get("SPARK_SHUFFLE_PARTITIONS", cls.spark_shuffle_partitions)
+            ),
+            sink_coalesce=int(_get("SINK_COALESCE", cls.sink_coalesce)),
+            jdbc_batchsize=int(_get("JDBC_BATCHSIZE", cls.jdbc_batchsize)),
+        )
+
+
+cfg = Settings.from_env()
 
 # =======================
 # SparkSession
 # =======================
-spark = SparkSession.builder.remote(CONNECT_URL).appName("Kappa-WindowJoin").getOrCreate()
-spark.conf.set("spark.sql.shuffle.partitions", os.getenv("SPARK_SHUFFLE_PARTITIONS", "8"))
+spark = (
+    SparkSession.builder.remote(cfg.connect_url).appName("Kappa-WindowJoin").getOrCreate()
+)
+
 
 # =======================
 # Schemas
@@ -67,8 +133,8 @@ events_schema = T.StructType(
 # =======================
 raw_tel = (
     spark.readStream.format("kafka")
-    .option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP)
-    .option("subscribe", TOPIC_TEL)
+    .option("kafka.bootstrap.servers", cfg.kafka_bootstrap)
+    .option("subscribe", cfg.topic_tel)
     .option("startingOffsets", "latest")
     .option("failOnDataLoss", False)
     .load()
@@ -76,8 +142,8 @@ raw_tel = (
 
 raw_evt = (
     spark.readStream.format("kafka")
-    .option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP)
-    .option("subscribe", TOPIC_EVT)
+    .option("kafka.bootstrap.servers", cfg.kafka_bootstrap)
+    .option("subscribe", cfg.topic_evt)
     .option("startingOffsets", "latest")
     .option("failOnDataLoss", False)
     .load()
@@ -121,7 +187,7 @@ events = (
 # =======================
 dim_device = (
     spark.read.format("jdbc")
-    .option("url", SR_JDBC_URL)
+    .option("url", cfg.sr_jdbc_url)
     .option("dbtable", "dim_device")
     .option("driver", "com.mysql.cj.jdbc.Driver")
     .load()
@@ -133,9 +199,9 @@ dim_b = F.broadcast(dim_device)
 # Windowed aggregates (telemetry & events)
 # =======================
 agg_tel = (
-    telemetry.withWatermark("event_time", WATERMARK)
+    telemetry.withWatermark("event_time", cfg.watermark)
     .dropDuplicates(["device_id", "event_time"])
-    .groupBy(F.window("event_time", WINDOW).alias("w"), "device_id")
+    .groupBy(F.window("event_time", cfg.window).alias("w"), "device_id")
     .agg(
         F.approx_count_distinct(F.date_trunc("minute", F.col("event_time"))).alias(
             "minutes_covered"
@@ -149,9 +215,9 @@ agg_tel = (
 
 
 agg_evt = (
-    events.withWatermark("event_time", WATERMARK)
+    events.withWatermark("event_time", cfg.watermark)
     .dropDuplicates(["event_id"])
-    .groupBy(F.window("event_time", WINDOW).alias("w"), "device_id")
+    .groupBy(F.window("event_time", cfg.window).alias("w"), "device_id")
     .agg(
         F.count(F.lit(1)).alias("events_total"),
         F.sum(F.when(F.col("event_type") == "failure", 1).otherwise(0)).alias(
@@ -180,9 +246,9 @@ t = agg_tel.alias("t")
 e = agg_evt.alias("e")
 d = dim_b.alias("d")
 
-expected_points = F.lit(EXPECTED_POINTS_PER_WINDOW)
-threshold_points = (expected_points * F.lit(COMPLETENESS_TOLERANCE)).cast("int")
-
+# expected_points = F.lit(EXPECTED_POINTS_PER_WINDOW)
+# threshold_points = (expected_points * F.lit(COMPLETENESS_TOLERANCE)).cast("int")
+threshold_points = F.lit(cfg.threshold_points)
 fact_5min = (
     t.join(
         e,
@@ -252,10 +318,10 @@ def upsert_to_starrocks(batch_df, batch_id: int):
         to_write.write.format("jdbc")
         .option(
             "url",
-            SR_JDBC_URL
+            cfg.sr_jdbc_url
             + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&rewriteBatchedStatements=true",
         )
-        .option("dbtable", SR_TABLE)
+        .option("dbtable", cfg.sr_table)
         .option("driver", "com.mysql.cj.jdbc.Driver")
         .option("batchsize", os.getenv("JDBC_BATCHSIZE", "5000"))
         .option("isolationLevel", "READ_COMMITTED")
@@ -273,8 +339,8 @@ query = (
         "append"
     )  # window joins can output updates; sink uses PK upsert
     .foreachBatch(upsert_to_starrocks)
-    .option("checkpointLocation", CHECKPOINT_DIR)
-    .trigger(processingTime=TRIGGER_EVERY)
+    .option("checkpointLocation", cfg.checkpoint_dir)
+    .trigger(processingTime=cfg.trigger_every)
     .start()
 )
 query.awaitTermination()
