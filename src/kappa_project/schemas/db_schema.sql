@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS dim_device (
   status STRING
 )
 PRIMARY KEY(device_id)
-DISTRIBUTED BY HASH(device_id);
+DISTRIBUTED BY HASH(device_id)
 PROPERTIES (
     "enable_persistent_index" = "true",
     "replication_num" = "1"
