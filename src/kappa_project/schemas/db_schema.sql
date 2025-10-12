@@ -58,9 +58,9 @@ ADD COLUMN events_sev_high        INT DEFAULT "0";
 
 
 CREATE TABLE IF NOT EXISTS fact_telemetry_5min (
+  device_id    STRING,
   window_start DATETIME,
   window_end   DATETIME,
-  device_id    STRING,
   cnt_points   INT,
   avg_temperature DOUBLE,
   min_temperature DOUBLE,
@@ -73,14 +73,14 @@ CREATE TABLE IF NOT EXISTS fact_telemetry_5min (
   model           STRING,
   minutes_covered INT DEFAULT "0",
   cnt_events INT DEFAULT "0",
-  incomplete_by_coverage BOOLEAN DEFAULT FALSE,
-  incomplete_by_volume   BOOLEAN DEFAULT FALSE,
+  incomplete_by_coverage BOOLEAN DEFAULT "FALSE",
+  incomplete_by_volume   BOOLEAN DEFAULT "FALSE",
   events_total           INT DEFAULT "0",
   events_failure         INT DEFAULT "0",
   events_maintenance     INT DEFAULT "0",
   events_inspection      INT DEFAULT "0",
   events_sev_high        INT DEFAULT "0",
-  updated_at      DATETIME DEFAULT NOW()
+  updated_at      DATETIME DEFAULT current_timestamp
 )
 PRIMARY KEY(device_id, window_start)
 DISTRIBUTED BY HASH(device_id)

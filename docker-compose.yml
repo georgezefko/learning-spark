@@ -136,6 +136,7 @@ services:
       - SUPERSET_DATABASE_URI=sqlite:////app/superset_home/superset.db
     volumes:
       - superset_home:/app/superset_home
+      - ./superset_config.py:/app/pythonpath/superset_config.py
     command: >
       /bin/sh -c "
       pip install --no-cache-dir PyMySQL==1.1.1 &&

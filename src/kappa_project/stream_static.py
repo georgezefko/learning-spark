@@ -4,9 +4,8 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
-# =======================
 # Config
-# =======================
+
 CONNECT_URL = os.getenv("SPARK_CONNECT_URL", "sc://spark-connect:15002")
 KAFKA_BOOTSTRAP = os.environ.get("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 KAFKA_TOPIC = "iot-telemetry"
@@ -41,8 +40,7 @@ telemetry_schema = T.StructType(
 
 
 # 2) Read from your local Kafka
-# Use host.docker.internal when running in devcontainer, localhost otherwise
-# Name the streams bronze to show that they are the first ingested data
+
 
 raw = (
     spark.readStream.format("kafka")
@@ -72,7 +70,7 @@ telemetry = (
 
 
 # Load static dim (StarRocks via JDBC) & broadcast
-# =======================
+
 dim_device = (
     spark.read.format("jdbc")
     .option("url", SR_JDBC_URL)
@@ -86,9 +84,8 @@ dim_device = (
 dim_b = F.broadcast(dim_device)
 
 
-# =======================
 # 5-min window + 3-min watermark
-# =======================
+
 agg5 = (
     telemetry.withWatermark("event_time", WATERMARK)
     .dropDuplicates(["device_id", "event_time"])
@@ -112,9 +109,9 @@ agg5 = (
     )
 )
 
-# =======================
+
 # Join + derive flags (in Spark)
-# =======================
+
 enriched = (
     agg5.join(dim_b, "device_id", "left")
     .withColumn("threshold_used", F.col("temp_anomaly_threshold"))
@@ -149,9 +146,8 @@ enriched = (
 def upsert_to_starrocks(batch_df, batch_id: int):
     if batch_df.limit(1).count() == 0:
         return
-    # Collect to driver as JSONL (fine for tutorial volume)
-    # Fewer, larger transactions (tune to your cluster)
-    to_write = batch_df.coalesce(4)  # or repartition(4) if you're pushing volume
+
+    to_write = batch_df.coalesce(4)
 
     (
         to_write.write.format("jdbc")
@@ -171,9 +167,8 @@ def upsert_to_starrocks(batch_df, batch_id: int):
     )
 
 
-# =======================
 # Start stream
-# =======================
+
 query = (
     enriched.writeStream.outputMode("append")
     .foreachBatch(upsert_to_starrocks)
