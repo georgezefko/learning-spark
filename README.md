@@ -45,13 +45,13 @@ You can find the relevant article with a detailed guide here: Medium blog is com
 To execute the scripts assosiated with this tutorial you need to run the data generator to create the events
 
 ```bash
-   python src/kappa_project/data_generator.py
+   make kappa_iot
    ```
 
 Then to start consuming and process the events with spark run
 
 ```bash
-   python src/kappa_project/stream_stream.py
+   make spark_streaming
    ```
 
 ## Requirements
