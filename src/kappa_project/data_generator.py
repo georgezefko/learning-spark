@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 
 from confluent_kafka import Producer
 
-# ---- Config ----
+# Config
 NUM_DEVICES = int(os.getenv("NUM_DEVICES", "10"))
 TELEMETRY_EPS = float(os.getenv("TELEMETRY_EVENTS_PER_SEC", "10"))
 EVENTS_EPS = float(os.getenv("EVENTS_PER_SEC", "1"))
@@ -20,7 +20,7 @@ THRESH_MAX = float(os.getenv("THRESH_MAX", "40"))  # 90
 WINDOW_SECS = 300  # 5 min windows
 RANDOM_SEED = int(os.getenv("RANDOM_SEED", "42"))
 
-# Scenario knobs (simple & deterministic)
+# Scenario knobs
 HOT_EVERY_N_WINDOWS = int(
     os.getenv("HOT_EVERY_N_WINDOWS", "4")
 )  # every 4th window is hot
@@ -35,7 +35,7 @@ LATE_OFFSET_SEC = int(
     os.getenv("LATE_OFFSET_SEC", "150")
 )  # lateness (keep < watermark to show inclusion/exclusion by tuning)
 
-# Event knobs (keep tiny)
+# Event knobs
 P_EVENT_BASE = float(os.getenv("P_EVENT_BASE", "0.02"))
 P_EVENT_IF_HOT = float(os.getenv("P_EVENT_IF_HOT", "0.25"))
 
@@ -113,7 +113,7 @@ def main():
             )  # simple different cadence
             outage_end = win_start + OUTAGE_SECONDS
 
-            # ---- Telemetry tick ----
+            # Telemetry tick
             if now >= next_tel:
                 dev = device_ids[i_tel]
                 t = synth_temp(prev_temp[dev])
@@ -125,7 +125,7 @@ def main():
 
                 # Outage: skip emits for outage device during first OUTAGE_SECONDS of the outage window
                 if dev == device_outage and in_outage_window and now < outage_end:
-                    pass  # skip produce → incomplete window
+                    pass  # skip produce -> incomplete window
                 else:
                     # Late: send a fixed fraction with a backdated timestamp
                     ts_for_msg = (
@@ -148,7 +148,7 @@ def main():
                 i_tel = (i_tel + 1) % len(device_ids)
                 next_tel += tel_interval
 
-            # ---- Events tick ----
+            #  Events tick
             if now >= next_evt:
                 dev = device_ids[i_evt]
                 # Deterministic anchor during hot windows for hot device (once per window near midpoint)
@@ -172,7 +172,7 @@ def main():
                         value=json.dumps(anchor, separators=(",", ":")),
                     )
                 else:
-                    # Light probabilistic events; hotter windows → higher chance
+                    # Light probabilistic events; hotter windows -> higher chance
                     hotish = dev == device_hot and in_hot_window
                     if random.random() < (P_EVENT_IF_HOT if hotish else P_EVENT_BASE):
                         evt = {

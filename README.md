@@ -2,6 +2,60 @@
 
 This repository provides a ready-to-run local Spark development lab using a Dev Container, Docker Compose, and Spark Connect. It includes Kafka, Schema Registry, MinIO (S3-compatible storage), Spark Connect, and optional StarRocks + Superset for analytics and visualization.
 
+## Project structure
+
+```
+├─ .devcontainer/
+│  ├─ devcontainer.json
+│  └─ Dockerfile
+├─ docker-compose.yml
+├─ spark-connect/
+│  ├─ Dockerfile
+│  └─ conf/
+│     ├─ core-site.xml
+│     └─ spark-defaults.conf
+├─ src/kappa_project/
+│  ├─ stream_stream.py
+│  ├─ data_generator.py
+│  ├─ stream_static.py
+│  └─ schemas/
+│  ├─ db_schema.sql
+│  ├─ db_analytics.sql
+├─ data/mm_dataset.csv
+├─ jars/
+└─ Makefile
+```
+
+## Repository Blogs
+
+### 1. Spark Dev Environment with DevContainers and Spark Connect
+
+End to End tutorial on how to set up the development environment to run Spark applications using DevContainers and Spark Connec
+
+You can find the relevant article with a detailed guide here: [Medium blog](https://medium.com/data-engineer-things/spark-dev-environment-with-devcontainers-and-spark-connect-647da8b6f0f8)
+
+
+### 2. Kappa Architecture in Action - From Sensors to Dashboards with Kafka, Spark Streaming, StarRocks, Minio, and Docker
+
+End to End tutorial on how to build a data pipeline using Kappa Architecture on a real-scenario using Spark Streaming.
+
+You can find the relevant article with a detailed guide here: Medium blog is coming
+
+
+To execute the scripts assosiated with this tutorial you need to run the data generator to create the events
+
+```bash
+   python src/kappa_project/data_generator.py
+   ```
+
+Then to start consuming and process the events with spark run
+
+```bash
+   python src/kappa_project/stream_stream.py
+   ```
+
+## Requirements
+
 ### Prerequisites
 - **Docker** and **Docker Compose** (Docker Desktop on macOS/Windows)
 - Option A (recommended): **VS Code** + **Dev Containers** extension
@@ -208,32 +262,3 @@ MinIO is available as `s3a://` with endpoint/config set in Spark defaults. A def
 - S3/MinIO auth errors: verify `.env` credentials and that `spark.hadoop.fs.s3a.*` settings are present (see `spark-connect/conf/*`).
 - Kafka connectivity: from the host use `localhost:9092`; from containers use `kafka:9093`.
 - Spark UI not visible: confirm ports `4040-4045` are exposed and no other app is using them.
-
----
-
-## Project structure (selected)
-
-```
-├─ .devcontainer/
-│  ├─ devcontainer.json
-│  └─ Dockerfile
-├─ docker-compose.yml
-├─ spark-connect/
-│  ├─ Dockerfile
-│  └─ conf/
-│     ├─ core-site.xml
-│     └─ spark-defaults.conf
-├─ src/kappa_project/
-│  ├─ streaming.py
-│  ├─ iot_data_generator.py
-│  └─ schemas/db_schema.sql
-├─ data/mm_dataset.csv
-├─ jars/
-└─ Makefile
-```
-
----
-
-## License
-
-MIT (or your preferred license).
