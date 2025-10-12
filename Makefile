@@ -2,10 +2,9 @@
 COMPOSE_FILE = docker-compose.yml
 
 
-#Run Spark Configutation tool
-spark_config:
-	cd src/spark_configuration
-	streamlit run main.py
+#Run Spark script
+run_spark:
+	python src/main.py data/mm_dataset.csv
 
 # Activate environment
 

@@ -7,25 +7,10 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: mnmcount <file>", file=sys.stderr)
         sys.exit(-1)
-    # Build a SparkSession using the SparkSession APIs.
-    # If one does not exist, then create an instance. There # can only be one SparkSession per JVM.
-    # spark = (
-    #     SparkSession.builder.appName("PythonMnMCount")
-    #     .config("spark.ui.enabled", "true")  # ensure UI is on
-    #     .config("spark.ui.port", "4040")
-    #     .getOrCreate()
-    # )
 
     spark = (
-        SparkSession.builder.remote("sc://spark-connect:15002").appName("learning-spark")
-        # .config("fs.s3a.threads.keepalivetime", "60000")  # 60 seconds = 60000 ms
-        # .config(
-        #     "spark.hadoop.fs.s3a.aws.credentials.provider",
-        #     "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider",
-        # )
-        # .config("fs.s3a.connection.establish.timeout", "30000")
-        # .config("fs.s3a.connection.timeout", "200000")
-        # .config("fs.s3a.multipart.purge.age", "86400000")
+        SparkSession.builder.remote("sc://spark-connect:15002")
+        .appName("learning-spark")
         .getOrCreate()
     )
     # Get the M&M data set filename from the command-line arguments
