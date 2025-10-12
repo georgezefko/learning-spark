@@ -125,6 +125,7 @@ services:
       "
     networks:
       - spark_network
+
   superset:
     image: apache/superset:latest
     container_name: superset
@@ -137,7 +138,9 @@ services:
       - superset_home:/app/superset_home
       - ./superset_config.py:/app/pythonpath/superset_config.py
     command: >
-      /bin/sh -c "superset db upgrade &&
+      /bin/sh -c "
+      pip install --no-cache-dir PyMySQL==1.1.1 &&
+      superset db upgrade &&
       superset fab create-admin --username admin --firstname Superset --lastname Admin --password admin --email admin@superset.com &&
       superset init &&
       superset run -h 0.0.0.0 -p 8088 --with-threads --reload --debugger"

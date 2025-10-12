@@ -32,3 +32,10 @@ browse:
 
 unit-tests:
 	@echo "Running unit tests..."
+	cd mage && python -m pytest tests/unit
+
+kappa_iot:
+	python src/kappa_project/data_generator.py
+
+spark_streaming:
+	python src/kappa_project/stream_stream.py

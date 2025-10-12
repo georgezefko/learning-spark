@@ -4,13 +4,13 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/root/.local/bin:/workspace/.venv/bin:${PATH}" \
     UV_LINK_MODE=copy
 
-# check uv container
 
 RUN --mount=type=cache,target=/var/cache/apt \
     set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-      curl make bash git ca-certificates procps \
+      curl make make bash git ca-certificates procps \
+      default-mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # uv package manager
@@ -20,7 +20,7 @@ WORKDIR /workspace
 
 COPY pyproject.toml uv.lock ./
 
-# 1) Create venv and install ONLY dependencies
+# Create venv and install ONLY dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv && uv sync --locked --no-install-project --no-dev
 
