@@ -1,6 +1,6 @@
 ## Learning Spark – Local Dev Environment with Dev Container, Spark Connect, Kafka, MinIO, and Superset
 
-This repository provides a ready-to-run local Spark development lab using a Dev Container, Docker Compose, and Spark Connect. It includes Kafka, Schema Registry, MinIO (S3-compatible storage), Spark Connect, and optional StarRocks + Superset for analytics and visualization.
+This repository provides Spark tutorials using a ready-to-run local Spark development lab with a Dev Container, Docker Compose, and Spark Connect.
 
 ## Project structure
 
@@ -39,7 +39,7 @@ You can find the relevant article with a detailed guide here: [Medium blog](http
 
 End to End tutorial on how to build a data pipeline using Kappa Architecture on a real-scenario using Spark Streaming.
 
-You can find the relevant article with a detailed guide here: Medium blog is coming
+You can find the relevant article with a detailed guide here: [Medium blog](https://medium.com/data-engineer-things/kappa-architecture-in-action-from-sensors-to-dashboards-with-kafka-spark-streaming-starrocks-80492a509e1a)
 
 
 To execute the scripts assosiated with this tutorial you need to run the data generator to create the events
